@@ -25,6 +25,8 @@ from datetime import timedelta as TD
 from pyx import path, canvas, color, style, text, graph
 from scipy import optimize
 
+DEBUG = True
+
 PI = atan(1)*4.0
 mnt_names = ['sıfırıncı', 'Ocak', 'Şubat', 'Mart',
           'Nisan', 'Mayıs', 'Haziran', 'Temmuz',
@@ -43,6 +45,43 @@ obs.long = '32.807'
 obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal time, +3 summer time
 utcTZ = pytz.timezone('UTC')
 
+
+# the almanac is for 2010
+begin_day_datetime = datetime.datetime(2009, 12, 31, 12, tzinfo=obsTZ)  # noon of the last day of 2009
+begin_day = ephem.Date(begin_day_datetime.astimezone(utcTZ)) # convert to UTC
+no_days = 366
+#no_days = 26
+
+class Chart() :
+    pass
+chart = Chart()
+chart.ULcorn = ephem.date(begin_day+4*ephem.hour) # at 4pm (in Ankara Sun does not set earlier than 4pm)
+chart.URcorn = ephem.date(chart.ULcorn+16*ephem.hour) # 8 am next day (in Ankara Sun does not rise later than 8am)
+chart.LLcorn = ephem.date(chart.ULcorn+no_days)
+chart.LRcorn = ephem.date(chart.URcorn+no_days)
+chart.width = 22.0
+chart.height = 34.0
+
+sun = ephem.Sun()
+# Twilights
+eve_twilight = []
+mor_twilight = []
+obs.horizon = '-18'
+for doy in range(no_days) :
+    obs.date = begin_day + doy
+    eve_twilight.append(obs.next_setting(sun))
+    mor_twilight.append(obs.next_rising(sun))
+obs.horizon = '0'
+
+# Normal Sunrise and Sunset
+sun_rise = []
+sun_set = []
+for doy in range(no_days) :
+    obs.date = begin_day + doy
+    sun_set.append(obs.next_setting(sun))
+    sun_rise.append(obs.next_rising(sun))
+
+# Objects to be plotted on the chart
 class PyEph_body() :
     def __init__(self, pyephem_name, clr=color.cmyk.Gray) :
         self.body = pyephem_name
@@ -56,8 +95,7 @@ class PyEph_body() :
         self.transit.append(obs.next_transit(self.body))
     def update_setting(self, obs) :
         self.setting.append(obs.next_setting(self.body))
-
-sun = ephem.Sun()
+# planets
 mercury = PyEph_body(ephem.Mercury(), color.cmyk.BurntOrange)
 venus =   PyEph_body(ephem.Venus(), color.cmyk.CornflowerBlue)
 mars =    PyEph_body(ephem.Mars(), color.cmyk.Red)
@@ -65,43 +103,36 @@ jupiter = PyEph_body(ephem.Jupiter(), color.cmyk.Magenta)
 saturn =  PyEph_body(ephem.Saturn(), color.cmyk.Yellow)
 uranus =  PyEph_body(ephem.Uranus(), color.cmyk.SpringGreen)
 neptune = PyEph_body(ephem.Neptune(), color.cmyk.ForestGreen)
+# messier objects
+m13 = PyEph_body(ephem.readdb("M13,f|C,16:41:42,36:28,5.9,2000,996"))
+m31 = PyEph_body(ephem.readdb("M31,f|G,0:42:44,+41:16:8,4.16,2000,11433|3700|35"))
+m42 = PyEph_body(ephem.readdb("M42,f|U,05:35:18,-05:23,4,2000,3960"))
+m45 = PyEph_body(ephem.readdb("M45,f|U,03:47:0,24:07,1.2,2000,6000"))
+# bright stars
+sirius     = PyEph_body(ephem.star('Sirius'))
+antares    = PyEph_body(ephem.star('Regulus'))
+deneb      = PyEph_body(ephem.star('Deneb'))
+betelgeuse = PyEph_body(ephem.star('Betelgeuse'))
+pollux     = PyEph_body(ephem.star('Pollux'))
 
-# the almanac is for 2010
-begin_day_datetime = datetime.datetime(2009, 12, 31, 12, tzinfo=obsTZ)  # noon of the last day of 2009
-begin_day = ephem.Date(begin_day_datetime.astimezone(utcTZ)) # convert to UTC
-no_days = 366
-#no_days = 26
+rising_bodies  = [mercury, venus, mars, jupiter, uranus, neptune,
+                  m13, m31, m42, m45,
+                  sirius, antares, deneb, betelgeuse, pollux]
+setting_bodies = [mercury, venus, mars, jupiter, uranus, neptune,
+                  m13, m31, m42, m45,
+                  sirius, antares, deneb, betelgeuse, pollux]
+transit_bodies = [mars, jupiter, uranus, neptune,
+                  m13, m31, m42, m45,
+                  sirius, antares, deneb, betelgeuse, pollux]
 
-class Chart() :
-    pass
-chart = Chart()
-chart.ULcorn = ephem.date(begin_day+4*ephem.hour) # at 4pm (in Ankara Sun does not set earlier than 4pm)
-chart.URcorn = ephem.date(chart.ULcorn+16*ephem.hour) # 8 am next day
-chart.LLcorn = ephem.date(chart.ULcorn+no_days)
-chart.LRcorn = ephem.date(chart.URcorn+no_days)
-chart.width = 22.0
-chart.height = 34.0
-
-eve_twilight = []
-mor_twilight = []
-obs.horizon = '-18'
-for doy in range(no_days) :
-    obs.date = begin_day + doy
-    eve_twilight.append(obs.next_setting(sun))
-    mor_twilight.append(obs.next_rising(sun))
-obs.horizon = '0'
-
-sun_rise = []
-sun_set = []
 rising_bodies  = [mercury, venus, mars, jupiter, uranus, neptune]
 setting_bodies = [mercury, venus, mars, jupiter, uranus, neptune]
 transit_bodies = [mars, jupiter, uranus, neptune]
 
-events_tbc = [] # events to be calculated
-for doy in range(no_days) :
-    obs.date = begin_day + doy
-    sun_set.append(obs.next_setting(sun))
-    sun_rise.append(obs.next_rising(sun))
+# XXX the +3, -3 bug fix below is a mystery to me,
+# XXX but it seems necessary.
+for doy in range(no_days+3) :
+    obs.date = begin_day + doy -3
     for rb in rising_bodies :
         rb.update_rising(obs)
     for tb in transit_bodies :
@@ -245,9 +276,8 @@ DNcolgrad = color.lineargradient(daycolor,nightcolor)
 # Third try: Per Alp Akoğlu's request let's try to this right.
 # This way it will also be more general and easier to adapt to higher
 # latitudes where twilight never ends on some days of the year
+
 gdata = []
-#for doy in range(no_days) :
-#    for tt in range(16*6+1) : # for 16 hours, every 10 minutes
 for doy in range(0, no_days, 10) :
     for tt in range(16*6+1) : # for 16 hours, every 10 minutes
         sun_tt = chart.ULcorn + doy + tt*ephem.minute*10
@@ -259,6 +289,7 @@ for doy in range(0, no_days, 10) :
         if z<0 : z=0
         gdata.append([x, y, z])
 
+# XXX I found the magic numbers below by trial error
 g = graph.graphxyz(size=1, xpos=11, ypos=16.73, xscale=12, yscale=18.31,
         projector=graph.graphxyz.parallel(-90, 90),
         x=graph.axis.linear(min=-1, max=chart.width+1, painter=None),
@@ -269,7 +300,7 @@ g.plot(graph.data.points(gdata, x=1, y=2, z=3, color=3),
                             gridcolor=None,
                             backcolor=color.rgb.black)])
 clc.insert(g)
-# the following for the debugging the graph above
+# the following if for the debugging the graph above
 #c.stroke(path.line(0, 0, chart.width, chart.height), [color.cmyk.Red])
 
 # vertical dots
