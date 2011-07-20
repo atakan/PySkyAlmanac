@@ -1,5 +1,5 @@
 This is program that prepares a chart similar to Sky & Telescope's
-annual *[Skygazer's Almanac](http://www.shopatsky.com/product/Skygazers-Almanac-2011-Wall-Chart/]*.
+annual [Skygazer's Almanac](http://www.shopatsky.com/product/Skygazers-Almanac-2011-Wall-Chart/].
 
 The code is written in Python. It uses
 [PyX](http://pyx.sourceforge.net/) for preparing the PDF output,
