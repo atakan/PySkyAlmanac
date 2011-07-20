@@ -28,18 +28,27 @@ obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal t
 utcTZ = pytz.timezone('UTC')
 
 class PyEph_body() :
-    def __init__(self, pyephem_name) :
+    def __init__(self, pyephem_name, clr=color.cmyk.Gray) :
         self.body = pyephem_name
+        self.color = clr
         self.rising = []
+        self.transit = []
+        self.setting = []
+    def update_rising(self, obs) :
+        self.rising.append(obs.next_rising(self.body))
+    def update_transit(self, obs) :
+        self.transit.append(obs.next_transit(self.body))
+    def update_setting(self, obs) :
+        self.setting.append(obs.next_setting(self.body))
 
 sun = ephem.Sun()
-mercury = ephem.Mercury()
-venus = ephem.Venus()
-mars = ephem.Mars()
-jupiter = ephem.Jupiter()
-saturn = ephem.Saturn()
-uranus = ephem.Uranus()
-neptune = ephem.Neptune()
+mercury = PyEph_body(ephem.Mercury(), color.cmyk.BurntOrange)
+venus =   PyEph_body(ephem.Venus(), color.cmyk.CornflowerBlue)
+mars =    PyEph_body(ephem.Mars(), color.cmyk.Red)
+jupiter = PyEph_body(ephem.Jupiter(), color.cmyk.Magenta)
+saturn =  PyEph_body(ephem.Saturn(), color.cmyk.Yellow)
+uranus =  PyEph_body(ephem.Uranus(), color.cmyk.SpringGreen)
+neptune = PyEph_body(ephem.Neptune(), color.cmyk.ForestGreen)
 
 # the almanac is for 2010
 begin_day_datetime = datetime.datetime(2009, 12, 31, 12, tzinfo=obsTZ)  # noon of the last day of 2009
@@ -68,50 +77,21 @@ obs.horizon = '0'
 
 sun_rise = []
 sun_set = []
-mercury_rise = []
-mercury_set = []
-venus_rise = []
-venus_set = []
-mars_rise = []
-mars_transit = []
-mars_set = []
-jupiter_rise = []
-jupiter_transit = []
-jupiter_set = []
-saturn_rise = []
-saturn_transit = []
-saturn_set = []
-uranus_rise = []
-uranus_transit = []
-uranus_set = []
-neptune_rise = []
-neptune_transit = []
-neptune_set = []
+rising_bodies  = [mercury, venus, mars, jupiter, uranus, neptune]
+setting_bodies = [mercury, venus, mars, jupiter, uranus, neptune]
+transit_bodies = [mars, jupiter, uranus, neptune]
 
 events_tbc = [] # events to be calculated
 for doy in range(no_days) :
     obs.date = begin_day + doy
     sun_set.append(obs.next_setting(sun))
     sun_rise.append(obs.next_rising(sun))
-    mercury_rise.append(obs.next_rising(mercury))
-    mercury_set.append(obs.next_setting(mercury))
-    venus_rise.append(obs.next_rising(venus))
-    venus_set.append(obs.next_setting(venus))
-    mars_rise.append(obs.next_rising(mars))
-    mars_transit.append(obs.next_transit(mars))
-    mars_set.append(obs.next_setting(mars))
-    jupiter_rise.append(obs.next_rising(jupiter))
-    jupiter_transit.append(obs.next_transit(jupiter))
-    jupiter_set.append(obs.next_setting(jupiter))
-    saturn_rise.append(obs.next_transit(saturn))
-    saturn_transit.append(obs.next_transit(saturn))
-    saturn_set.append(obs.next_transit(saturn))
-    uranus_rise.append(obs.next_transit(uranus))
-    uranus_transit.append(obs.next_transit(uranus))
-    uranus_set.append(obs.next_transit(uranus))
-    neptune_rise.append(obs.next_transit(neptune))
-    neptune_transit.append(obs.next_transit(neptune))
-    neptune_set.append(obs.next_transit(neptune))
+    for rb in rising_bodies :
+        rb.update_rising(obs)
+    for tb in transit_bodies :
+        tb.update_transit(obs)
+    for sb in setting_bodies :
+        sb.update_setting(obs)
 
 def to_chart_coord(event_time, chart) :
     diff =  event_time - chart.ULcorn
@@ -316,20 +296,14 @@ clc.stroke(event_to_path(eve_twilight, chart),
            [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
 clc.stroke(event_to_path(mor_twilight, chart),
            [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
-# Planets
-clc.stroke(event_to_path(mercury_rise, chart), [color.cmyk.BurntOrange])
-clc.stroke(event_to_path(mercury_set, chart), [color.cmyk.BurntOrange])
-clc.stroke(event_to_path(venus_rise, chart), [color.cmyk.CornflowerBlue])
-clc.stroke(event_to_path(venus_set, chart), [color.cmyk.CornflowerBlue])
-clc.stroke(event_to_path(mars_rise, chart),    [color.cmyk.Red])
-clc.stroke(event_to_path(mars_transit, chart), [color.cmyk.Red])
-clc.stroke(event_to_path(mars_set, chart),     [color.cmyk.Red])
-clc.stroke(event_to_path(jupiter_rise, chart), [color.cmyk.Magenta])
-clc.stroke(event_to_path(jupiter_transit, chart), [color.cmyk.Magenta])
-clc.stroke(event_to_path(jupiter_set, chart), [color.cmyk.Magenta])
-clc.stroke(event_to_path(saturn_transit, chart), [color.cmyk.Yellow])
-clc.stroke(event_to_path(uranus_transit, chart), [color.cmyk.SpringGreen])
-clc.stroke(event_to_path(neptune_transit, chart), [color.cmyk.ForestGreen])
+# Planets etc.
+for rb in rising_bodies :
+    clc.stroke(event_to_path(rb.rising, chart), [rb.color])
+for tb in transit_bodies :
+    clc.stroke(event_to_path(tb.transit, chart), [tb.color])
+for sb in setting_bodies :
+    clc.stroke(event_to_path(sb.setting, chart), [sb.color])
+
 
 # Moon
 moon = ephem.Moon()
