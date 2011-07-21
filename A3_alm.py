@@ -24,8 +24,6 @@ from datetime import timedelta as TD
 from pyx import path, canvas, color, style, text, graph
 from scipy import optimize
 
-DEBUG = True
-
 PI = atan(1)*4.0
 mnt_names = ['sıfırıncı', 'Ocak', 'Şubat', 'Mart',
           'Nisan', 'Mayıs', 'Haziran', 'Temmuz',
@@ -132,7 +130,8 @@ setting_bodies = [mercury, venus, mars, jupiter, uranus, neptune]
 transit_bodies = [mars, jupiter, uranus, neptune]
 
 # XXX the +3, -3 bug fix below is a mystery to me,
-# XXX but it seems necessary.
+# XXX but it seems necessary. this probably points out to a deeper
+# XXX problem.
 for doy in range(no_days+3) :
     obs.date = begin_day + doy -3
     for rb in rising_bodies :
@@ -159,8 +158,10 @@ def event_to_path(event, chart) :
     p = path.path(path.moveto(x,y))
     for e in event[1:] :
         old_x = x
+        old_y = y
         x, y = to_chart_coord(e, chart)
-        if fabs(old_x - x) < chart.width/2.0 :
+        if (fabs(old_x - x) < chart.width/2.0  and
+            fabs(old_y - y) < chart.height/2.0) :  
             p.append(path.lineto(x, y))
         else :
             p.append(path.moveto(x, y))
@@ -328,7 +329,7 @@ h = chart.height
 for i in range(nlines) :
     clc.stroke(path.line(i*xincr, 0, i*xincr, h),
             [color.cmyk.Gray, style.linestyle(style.linecap.round,
-                style.dash([0, 2.6333]))])
+                style.dash([0, 2.6333*366.0/no_days]))])
 
 # horizontal dots
 # we start with the first Sunday of the year
