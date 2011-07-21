@@ -16,7 +16,6 @@
 #    along with this program (probably in a file named COPYING).
 #    If not, see <http://www.gnu.org/licenses/>.
 
-
 from __future__ import division, print_function
 
 from math import floor, fmod, fabs, atan2, atan, asin, sqrt
@@ -45,7 +44,7 @@ obs.long = '32.807'
 obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal time, +3 summer time
 utcTZ = pytz.timezone('UTC')
 
-year = 2010
+year = 2012
 begin_day_datetime = datetime.datetime(year-1, 12, 31, 12, tzinfo=obsTZ) # noon of the last day of previous year
 begin_day = ephem.Date(begin_day_datetime.astimezone(utcTZ)) # convert to UTC
 if calendar.isleap(year) :
@@ -294,32 +293,32 @@ DNcolgrad = color.lineargradient(daycolor,nightcolor)
 # This way it will also be more general and easier to adapt to higher
 # latitudes where twilight never ends on some days of the year
 
-#gdata = []
-#for doy in range(0, no_days, 10) :
-#    for tt in range(16*6+1) : # for 16 hours, every 10 minutes
-#        sun_tt = chart.ULcorn + doy + tt*ephem.minute*10
-#        x, y = to_chart_coord(sun_tt, chart)
-#        obs.date = sun_tt
-#        sun.compute(obs)
-#        z = sun.alt/ephem.degrees('-18:00:00')
-#        if z>1 : z=1
-#        if z<0 : z=0
-#        z = z*z # this makes the twilight more prominent
-#        gdata.append([x, y, z])
-#
-## XXX I found the magic numbers below by trial error
-#g = graph.graphxyz(size=1, xpos=11, ypos=16.73, xscale=12, yscale=18.31,
-#        projector=graph.graphxyz.parallel(-90, 90),
-#        x=graph.axis.linear(min=-1, max=chart.width+1, painter=None),
-#        y=graph.axis.linear(min=-1, max=chart.height+1, painter=None),
-#        z=graph.axis.linear(min=-1, max=2, painter=None))
-#g.plot(graph.data.points(gdata, x=1, y=2, z=3, color=3),
-#       [graph.style.surface(gradient=DNcolgrad,
-#                            gridcolor=None,
-#                            backcolor=color.rgb.black)])
-#clc.insert(g)
-## the following if for the debugging the graph above
-##c.stroke(path.line(0, 0, chart.width, chart.height), [color.cmyk.Red])
+gdata = []
+for doy in range(0, no_days, 10) :
+    for tt in range(16*6+1) : # for 16 hours, every 10 minutes
+        sun_tt = chart.ULcorn + doy + tt*ephem.minute*10
+        x, y = to_chart_coord(sun_tt, chart)
+        obs.date = sun_tt
+        sun.compute(obs)
+        z = sun.alt/ephem.degrees('-18:00:00')
+        if z>1 : z=1
+        if z<0 : z=0
+        z = z*z # this makes the twilight more prominent
+        gdata.append([x, y, z])
+
+# XXX I found the magic numbers below by trial error
+g = graph.graphxyz(size=1, xpos=11, ypos=16.73, xscale=12, yscale=18.31,
+        projector=graph.graphxyz.parallel(-90, 90),
+        x=graph.axis.linear(min=-1, max=chart.width+1, painter=None),
+        y=graph.axis.linear(min=-1, max=chart.height+1, painter=None),
+        z=graph.axis.linear(min=-1, max=2, painter=None))
+g.plot(graph.data.points(gdata, x=1, y=2, z=3, color=3),
+       [graph.style.surface(gradient=DNcolgrad,
+                            gridcolor=None,
+                            backcolor=color.rgb.black)])
+clc.insert(g)
+# the following if for the debugging the graph above
+#c.stroke(path.line(0, 0, chart.width, chart.height), [color.cmyk.Red])
 
 # vertical dots
 # left side is 4pm, right side is 8am. We will draw dots every 1/2 hour
@@ -537,5 +536,5 @@ c.stroke(bot_line)
 c.stroke(event_to_path(sun_set, chart))
 c.stroke(event_to_path(sun_rise, chart))
 
-c.writePDFfile("almanac_2010_Ankara")
+c.writePDFfile("almanac_%d_Ankara" % (year))
 
