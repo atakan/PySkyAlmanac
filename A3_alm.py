@@ -45,12 +45,13 @@ obs.long = '32.807'
 obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal time, +3 summer time
 utcTZ = pytz.timezone('UTC')
 
-
-# the almanac is for 2010
-begin_day_datetime = datetime.datetime(2009, 12, 31, 12, tzinfo=obsTZ)  # noon of the last day of 2009
+year = 2010
+begin_day_datetime = datetime.datetime(year-1, 12, 31, 12, tzinfo=obsTZ) # noon of the last day of previous year
 begin_day = ephem.Date(begin_day_datetime.astimezone(utcTZ)) # convert to UTC
-no_days = 366
-#no_days = 26
+if calendar.isleap(year) :
+    no_days = 367
+else :
+    no_days = 366
 
 class Chart() :
     pass
@@ -64,6 +65,8 @@ chart.height = 34.0
 
 sun = ephem.Sun()
 # Twilights
+# In Ankara evening twilight always ends. This would not be true for
+# locations much more further than the equator.
 eve_twilight = []
 mor_twilight = []
 obs.horizon = '-18'
@@ -103,12 +106,12 @@ jupiter = PyEph_body(ephem.Jupiter(), color.cmyk.Magenta)
 saturn =  PyEph_body(ephem.Saturn(), color.cmyk.Yellow)
 uranus =  PyEph_body(ephem.Uranus(), color.cmyk.SpringGreen)
 neptune = PyEph_body(ephem.Neptune(), color.cmyk.ForestGreen)
-# messier objects
+# some messier objects
 m13 = PyEph_body(ephem.readdb("M13,f|C,16:41:42,36:28,5.9,2000,996"))
 m31 = PyEph_body(ephem.readdb("M31,f|G,0:42:44,+41:16:8,4.16,2000,11433|3700|35"))
 m42 = PyEph_body(ephem.readdb("M42,f|U,05:35:18,-05:23,4,2000,3960"))
 m45 = PyEph_body(ephem.readdb("M45,f|U,03:47:0,24:07,1.2,2000,6000"))
-# bright stars
+# some bright stars
 sirius     = PyEph_body(ephem.star('Sirius'))
 antares    = PyEph_body(ephem.star('Regulus'))
 deneb      = PyEph_body(ephem.star('Deneb'))
@@ -213,22 +216,15 @@ rev_sun_set.reverse()
 clippath = event_to_path_no_check(rev_sun_set[:] + sun_rise[:], chart)
 clippath.append(path.closepath())
 
-c.stroke(top_line)
-c.stroke(bot_line)
-
-c.stroke(event_to_path(sun_set, chart))
-c.stroke(event_to_path(sun_rise, chart))
-
 clc = canvas.canvas([canvas.clip(clippath)])
 
-# a seperate clipping canvas for Moon phases
+# a seperate (larger) clipping canvas for Moon phases
 clippath2 = event_to_path_no_check_with_offset([rev_sun_set[0]+2.0] +
         rev_sun_set[:] + [rev_sun_set[-1]-2.0], chart,
             xoffset=-1.2)
 clippath2 = clippath2.joined(event_to_path_no_check_with_offset([sun_rise[0]-2.0] +
             sun_rise[:] + [sun_rise[-1]+2.0], chart, xoffset=1.2))
 clippath2.append(path.closepath())
-#c.stroke(clippath2)
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
 # make a gradient of dark blue to black in the bg
@@ -334,9 +330,13 @@ for i in range(nlines) :
     clc.stroke(path.line(i*xincr, 0, i*xincr, h),
             [color.cmyk.Gray, style.linestyle(style.linecap.round,
                 style.dash([0, 2.6333]))])
+
 # horizontal dots
-# In 2010, the first Sunday was Jan 3rd, i.e., 3 days after chart.ULcorn
-for sunday in range(3, no_days, 7) :
+# we start with the first Sunday of the year
+for first_sun in range(1,8) :
+    if calendar.weekday(year, 1, first_sun) == calendar.SUNDAY :
+        break
+for sunday in range(first_sun, no_days, 7) :
     x1 = 0
     x2 = chart.width
     y = chart.height - (sunday * chart.height / no_days)
@@ -373,6 +373,7 @@ for tb in transit_bodies :
 for sb in setting_bodies :
     clc.stroke(event_to_path(sb.setting, chart), [sb.color])
 
+c.insert(clc)
 
 # Moon
 moon = ephem.Moon()
@@ -505,9 +506,9 @@ c.text(x, y2, 'SABAH', [text.halign.center, text.valign.baseline])
 
 # month labels
 for i in range(1,13) :
-    dt1_datetime = datetime.datetime(2010, i, 14, 12, tzinfo=obsTZ) 
-    dt2_datetime = datetime.datetime(2010, i, 15, 12, tzinfo=obsTZ) 
-    dt3_datetime = datetime.datetime(2010, i, 16, 12, tzinfo=obsTZ) 
+    dt1_datetime = datetime.datetime(year, i, 14, 12, tzinfo=obsTZ) 
+    dt2_datetime = datetime.datetime(year, i, 15, 12, tzinfo=obsTZ) 
+    dt3_datetime = datetime.datetime(year, i, 16, 12, tzinfo=obsTZ) 
     n_dt2 = int(dt2_datetime.strftime('%j'))
     x, y = to_chart_coord(sun_set[n_dt2], chart)
     xb, yb = to_chart_coord(sun_set[n_dt2-1], chart)
@@ -515,11 +516,11 @@ for i in range(1,13) :
     slope = atan2(ya-yb, xa-xb) 
     c.text(x-1, y,
         r'\begin{turn}{%d}{\Large %s}\end{turn}' %
-        (slope*180/(355.0/113), mnt_names[i]),
+        (slope*180/PI, mnt_names[i]),
         [text.halign.center, text.valign.middle])
-    dt1_datetime = datetime.datetime(2010, i, 14, 12, tzinfo=obsTZ) 
-    dt2_datetime = datetime.datetime(2010, i, 15, 12, tzinfo=obsTZ) 
-    dt3_datetime = datetime.datetime(2010, i, 16, 12, tzinfo=obsTZ) 
+    dt1_datetime = datetime.datetime(year, i, 14, 12, tzinfo=obsTZ) 
+    dt2_datetime = datetime.datetime(year, i, 15, 12, tzinfo=obsTZ) 
+    dt3_datetime = datetime.datetime(year, i, 16, 12, tzinfo=obsTZ) 
     n_dt2 = int(dt2_datetime.strftime('%j'))
     x, y = to_chart_coord(sun_rise[n_dt2], chart)
     xb, yb = to_chart_coord(sun_rise[n_dt2-1], chart)
@@ -527,8 +528,14 @@ for i in range(1,13) :
     slope = atan2(ya-yb, xa-xb) 
     c.text(x+1, y,
         r'\begin{turn}{%d}{\Large %s}\end{turn}' %
-        (slope*180/(355.0/113), mnt_names[i]),
+        (slope*180/PI, mnt_names[i]),
         [text.halign.center, text.valign.middle])
+
+c.stroke(top_line)
+c.stroke(bot_line)
+
+c.stroke(event_to_path(sun_set, chart))
+c.stroke(event_to_path(sun_rise, chart))
 
 c.writePDFfile("almanac_2010_Ankara")
 
