@@ -176,6 +176,18 @@ def event_to_path_no_check(event, chart) :
         p.append(path.lineto(x, y))
     return p
 
+def event_to_path_no_check_with_offset(event, chart, xoffset=0.0, yoffset=0.0) :
+    '''accepts an array of points representing an event, converts this
+       event to a path. this version does not check for big jumps in x
+       coordinate'''
+    x, y = to_chart_coord(event[0], chart)
+    p = path.path(path.moveto(x+xoffset,y+yoffset))
+    for e in event[1:] :
+        old_x = x
+        x, y = to_chart_coord(e, chart)
+        p.append(path.lineto(x+xoffset, y+yoffset))
+    return p
+
 pyx.unit.set(defaultunit='cm')
 pyx.text.set(mode='latex')
 pyx.text.preamble(r'\usepackage[utf8x]{inputenc}')
@@ -184,7 +196,6 @@ pyx.text.preamble(r'\usepackage{ae,aecompl}')
 pyx.text.preamble(r'\usepackage{rotating}')
 
 c = canvas.canvas()
-#d = pyx.document.document()
 
 # draw the limits of the chart and prepare a clippath
 ulx, uly = to_chart_coord(sun_set[0], chart)
@@ -209,6 +220,16 @@ c.stroke(event_to_path(sun_set, chart))
 c.stroke(event_to_path(sun_rise, chart))
 
 clc = canvas.canvas([canvas.clip(clippath)])
+
+# a seperate clipping canvas for Moon phases
+clippath2 = event_to_path_no_check_with_offset([rev_sun_set[0]+2.0] +
+        rev_sun_set[:] + [rev_sun_set[-1]-2.0], chart,
+            xoffset=-1.2)
+clippath2 = clippath2.joined(event_to_path_no_check_with_offset([sun_rise[0]-2.0] +
+            sun_rise[:] + [sun_rise[-1]+2.0], chart, xoffset=1.2))
+clippath2.append(path.closepath())
+#c.stroke(clippath2)
+mclc = canvas.canvas([canvas.clip(clippath2)])
 
 # make a gradient of dark blue to black in the bg
 daycolor = color.rgb(0,82/255.0,137/255.0)
@@ -277,31 +298,32 @@ DNcolgrad = color.lineargradient(daycolor,nightcolor)
 # This way it will also be more general and easier to adapt to higher
 # latitudes where twilight never ends on some days of the year
 
-gdata = []
-for doy in range(0, no_days, 10) :
-    for tt in range(16*6+1) : # for 16 hours, every 10 minutes
-        sun_tt = chart.ULcorn + doy + tt*ephem.minute*10
-        x, y = to_chart_coord(sun_tt, chart)
-        obs.date = sun_tt
-        sun.compute(obs)
-        z = sun.alt/ephem.degrees('-18:00:00')
-        if z>1 : z=1
-        if z<0 : z=0
-        gdata.append([x, y, z])
-
-# XXX I found the magic numbers below by trial error
-g = graph.graphxyz(size=1, xpos=11, ypos=16.73, xscale=12, yscale=18.31,
-        projector=graph.graphxyz.parallel(-90, 90),
-        x=graph.axis.linear(min=-1, max=chart.width+1, painter=None),
-        y=graph.axis.linear(min=-1, max=chart.height+1, painter=None),
-        z=graph.axis.linear(min=-1, max=2, painter=None))
-g.plot(graph.data.points(gdata, x=1, y=2, z=3, color=3),
-       [graph.style.surface(gradient=DNcolgrad,
-                            gridcolor=None,
-                            backcolor=color.rgb.black)])
-clc.insert(g)
-# the following if for the debugging the graph above
-#c.stroke(path.line(0, 0, chart.width, chart.height), [color.cmyk.Red])
+#gdata = []
+#for doy in range(0, no_days, 10) :
+#    for tt in range(16*6+1) : # for 16 hours, every 10 minutes
+#        sun_tt = chart.ULcorn + doy + tt*ephem.minute*10
+#        x, y = to_chart_coord(sun_tt, chart)
+#        obs.date = sun_tt
+#        sun.compute(obs)
+#        z = sun.alt/ephem.degrees('-18:00:00')
+#        if z>1 : z=1
+#        if z<0 : z=0
+#        z = z*z # this makes the twilight more prominent
+#        gdata.append([x, y, z])
+#
+## XXX I found the magic numbers below by trial error
+#g = graph.graphxyz(size=1, xpos=11, ypos=16.73, xscale=12, yscale=18.31,
+#        projector=graph.graphxyz.parallel(-90, 90),
+#        x=graph.axis.linear(min=-1, max=chart.width+1, painter=None),
+#        y=graph.axis.linear(min=-1, max=chart.height+1, painter=None),
+#        z=graph.axis.linear(min=-1, max=2, painter=None))
+#g.plot(graph.data.points(gdata, x=1, y=2, z=3, color=3),
+#       [graph.style.surface(gradient=DNcolgrad,
+#                            gridcolor=None,
+#                            backcolor=color.rgb.black)])
+#clc.insert(g)
+## the following if for the debugging the graph above
+##c.stroke(path.line(0, 0, chart.width, chart.height), [color.cmyk.Red])
 
 # vertical dots
 # left side is 4pm, right side is 8am. We will draw dots every 1/2 hour
@@ -367,12 +389,12 @@ def R_of_S(S) :
     return optimize.bisect(func, 1.0000001, 100.0)
 
 def first_quarter_moon(r, cx, cy) :
-    p = path.path(path.moveto(cx, cy-r))
+    p = path.path(path.moveto(cx, cy))
     p.append(path.arc(cx, cy, r, -90, 90))
     p.append(path.closepath())
     return p
 def last_quarter_moon(r, cx, cy) :
-    p = path.path(path.moveto(cx, cy+r))
+    p = path.path(path.moveto(cx, cy))
     p.append(path.arc(cx, cy, r, 90, -90))
     p.append(path.closepath())
     return p
@@ -417,58 +439,45 @@ for doy in range(no_days) :
     X = moon2.moon_phase
     # Waxing moon (moonsets)
     x, y = to_chart_coord(moon_set, chart)
-    if X>0.995 :
+    if (fabs(ephem.next_full_moon(mpc) - mpc) < 0.5 or
+        fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
         # full moon
-        clc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
     elif ((X < 0.55 and X > 0.45) or 
           fabs(ephem.next_first_quarter_moon(mpc) - mpc) < 0.5 or
           fabs(ephem.previous_first_quarter_moon(mpc) - mpc) < 0.5) :
         # first quarter
-        clc.stroke(first_quarter_moon(0.12, x,y),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-    elif X < 0.005 :
+        mclc.stroke(first_quarter_moon(0.12, x,y),[mooncolordark,pyx.deco.filled([mooncolordark])])
+    elif (fabs(ephem.next_new_moon(mpc) - mpc) < 0.5 or
+          fabs(ephem.previous_new_moon(mpc) - mpc) < 0.5):
         # new moon
-        clc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
+        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
     else :
-        clc.fill(waxing_moon(X, 0.08, x, y),
-                [style.linejoin.bevel,mooncolorlight])
-
-#    if (fabs(ephem.next_full_moon(mpc) - mpc) < 0.5 or
-#        fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
-#        # full moon
-#        clc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-#    if (fabs(ephem.next_first_quarter_moon(mpc) - mpc) < 0.5 or
-#        fabs(ephem.previous_first_quarter_moon(mpc) - mpc) < 0.5) :
-#        # first quarter
-#        clc.stroke(first_quarter_moon(0.12, x,y),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-#    if (fabs(ephem.next_new_moon(mpc) - mpc) < 0.5 or
-#        fabs(ephem.previous_new_moon(mpc) - mpc) < 0.5) :
-#        # new moon
-#        clc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
-#    else :
-#        clc.fill(waxing_moon(X, 0.08, x, y),
-#                [style.linejoin.bevel,mooncolordark])
-
+        mclc.fill(waxing_moon(X, 0.08, x, y),
+                [style.linejoin.bevel,mooncolordark])
     # Waning moon (moonrises)
     moon_rise = obs.next_rising(moon)
     moon2.compute(moon_rise)
     X = moon2.moon_phase
     x, y = to_chart_coord(moon_rise, chart)
-    if X>0.995 :
+    if (fabs(ephem.next_full_moon(mpc) - mpc) < 0.5 or
+        fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
         # full moon
-        clc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
     elif ((X < 0.55 and X > 0.45) or 
           fabs(ephem.next_last_quarter_moon(mpc) - mpc) < 0.5 or
           fabs(ephem.previous_last_quarter_moon(mpc) - mpc) < 0.5) :
         # last quarter
-        clc.stroke(last_quarter_moon(0.12, x,y),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-    elif X < 0.005 :
+        mclc.stroke(last_quarter_moon(0.12, x,y),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+    elif (fabs(ephem.next_new_moon(mpc) - mpc) < 0.5 or
+          fabs(ephem.previous_new_moon(mpc) - mpc) < 0.5):
         # new moon
-        clc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
+        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
     else :
-        clc.fill(waning_moon(X, 0.08, x, y),
-                [style.linejoin.bevel,mooncolordark])
+        mclc.fill(waning_moon(X, 0.08, x, y),
+                [style.linejoin.bevel,mooncolorlight])
 
-c.insert(clc)
+c.insert(mclc)
 
 # hour labels (from 5pm to 7am)
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
