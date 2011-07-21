@@ -1,0 +1,8 @@
+Cosmetic:
+-- Fix Moon phases outside the chart boundaries: Only Full, New and
+Quarter moons to be plotted w/ transparency
+-- Add a little key for Moon phases
+-- Cyan/Pink background for Month labels, to indicate DST
+
+Localization: 
+-- Detect discontinuities in twilight zones and draw them accordingly.
