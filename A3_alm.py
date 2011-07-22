@@ -132,8 +132,6 @@ rising_bodies  = [mercury, venus, mars, jupiter, saturn, uranus, neptune]
 setting_bodies = [mercury, venus, mars, jupiter, saturn, uranus, neptune]
 transit_bodies = [mars, jupiter, saturn, uranus, neptune]
 
-setting_bodies = [mars]
-transit_bodies = [mars]
 
 # XXX the +3, -3 bug fix below is a mystery to me,
 # XXX but it seems necessary. this probably points out to a deeper
@@ -437,7 +435,7 @@ mercury.rising_text = [
 [0.89, 'Merkür', 'doğuyor', -1, False]
 ]
 venus.rising_text = [
-[0.78, 'Venüs doğuyor', '~', -1, True]
+[0.76, 'Venüs doğuyor', '~', -1, True]
 ]
 mars.rising_text = [
 [0.1, 'Mars doğuyor', '~', 0, False]
@@ -446,7 +444,7 @@ jupiter.rising_text = [
 [0.62, 'Jüpiter doğuyor', '~', 0, False]
 ]
 saturn.rising_text = [
-[0.15, 'SJüpiter doğuyor', '~', 0, False]
+[0.15, 'Satürn doğuyor', '~', 0, False]
 ]
 uranus.rising_text = [
 [0.45, 'Uranüs', 'doğuyor', -1, False]
@@ -460,10 +458,56 @@ for rb in rising_bodies :
         add_text_to_path(clc, chart, rb.rising, rstxt[0],
                 txt1=rstxt[1], txt2=rstxt[2], offset=rstxt[3],
                 rotate=rstxt[4], txt_color=rb.color)
+mars.transit_text = [
+[0.1, 'Mars meridyende', '~', 0, False]
+]
+jupiter.transit_text = [
+[0.06, 'Jüpiter', 'meridyende', -1, False],
+[0.87, 'Jüpiter meridyende', '~', 0, False]
+]
+saturn.transit_text = [
+[0.15, 'Satürn meridyende', '~', 0, False]
+]
+uranus.transit_text = [
+[0.014, 'Ur.', 'mrd.', -1, False],
+[0.75, '~', 'Uranüs meridyende', -1, False]
+]
+neptune.transit_text = [
+[0.67, '~', 'Neptün meridyende', -1, False]
+]
 for tb in transit_bodies :
-    clc.stroke(event_to_path(tb.transit, chart), [tb.color])
+    c.stroke(event_to_path(tb.transit, chart), [tb.color])
+    for tstxt in tb.transit_text :
+        add_text_to_path(c, chart, tb.transit, tstxt[0],
+                txt1=tstxt[1], txt2=tstxt[2], offset=tstxt[3],
+                rotate=tstxt[4], txt_color=tb.color)
+mercury.setting_text = [
+[0.1, 'Merkür batıyor', '~', 0, False]
+]
+venus.setting_text = [
+[0.1, 'Venüs batıyor', '~', 0, False]
+]
+mars.setting_text = [
+[0.1, 'Mars batıyor', '~', 0, False]
+]
+jupiter.setting_text = [
+[0.87, 'Jüpiter batıyor', '~', 0, False]
+]
+saturn.setting_text = [
+[0.15, 'Satürn batıyor', '~', 0, False]
+]
+uranus.setting_text = [
+[0.75, '~', 'Uranüs batıyor', -1, False]
+]
+neptune.setting_text = [
+[0.67, '~', 'Neptün batıyor', -1, False]
+]
 for sb in setting_bodies :
-    clc.stroke(event_to_path(sb.setting, chart), [sb.color])
+    c.stroke(event_to_path(sb.setting, chart), [sb.color])
+    for sttxt in sb.setting_text :
+        add_text_to_path(c, chart, sb.setting, tstxt[0],
+                txt1=sttxt[1], txt2=sttxt[2], offset=sttxt[3],
+                rotate=sttxt[4], txt_color=sb.color)
 
 c.insert(clc)
 
