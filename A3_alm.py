@@ -18,7 +18,7 @@
 
 from __future__ import division, print_function
 
-from math import floor, fmod, fabs, atan2, atan, asin, sqrt
+from math import floor, fmod, fabs, atan2, atan, asin, sqrt, sin, cos
 import datetime, calendar, ephem, pytz, pyx
 from datetime import timedelta as TD
 from pyx import path, canvas, color, style, text, graph
@@ -87,8 +87,11 @@ class PyEph_body() :
         self.body = pyephem_name
         self.color = clr
         self.rising = []
+        self.rising_text = []
         self.transit = []
+        self.transit_text = []
         self.setting = []
+        self.setting_text = []
     def update_rising(self, obs) :
         self.rising.append(obs.next_rising(self.body))
     def update_transit(self, obs) :
@@ -125,9 +128,12 @@ transit_bodies = [mars, jupiter, uranus, neptune,
                   m13, m31, m42, m45,
                   sirius, antares, deneb, betelgeuse, pollux]
 
-rising_bodies  = [mercury, venus, mars, jupiter, uranus, neptune]
-setting_bodies = [mercury, venus, mars, jupiter, uranus, neptune]
-transit_bodies = [mars, jupiter, uranus, neptune]
+rising_bodies  = [mercury, venus, mars, jupiter, saturn, uranus, neptune]
+setting_bodies = [mercury, venus, mars, jupiter, saturn, uranus, neptune]
+transit_bodies = [mars, jupiter, saturn, uranus, neptune]
+
+setting_bodies = [mars]
+transit_bodies = [mars]
 
 # XXX the +3, -3 bug fix below is a mystery to me,
 # XXX but it seems necessary. this probably points out to a deeper
@@ -200,7 +206,7 @@ pyx.text.preamble(r'\usepackage{rotating}')
 
 c = canvas.canvas()
 
-# draw the limits of the chart and prepare a clippath
+# prepare the limits of the chart and a clippath
 ulx, uly = to_chart_coord(sun_set[0], chart)
 urx, ury = to_chart_coord(sun_rise[0], chart)
 top_line = path.path(path.moveto(ulx, uly),
@@ -292,34 +298,34 @@ DNcolgrad = color.lineargradient(daycolor,nightcolor)
 
 # Third try: Per Alp Akoğlu's request let's try to this right.
 # This way it will also be more general and easier to adapt to higher
-# latitudes where twilight never ends on some days of the year
+# latitudes where twilight never ends on some days of the year.
 
-gdata = []
-for doy in range(0, no_days, 10) :
-    for tt in range(16*6+1) : # for 16 hours, every 10 minutes
-        sun_tt = chart.ULcorn + doy + tt*ephem.minute*10
-        x, y = to_chart_coord(sun_tt, chart)
-        obs.date = sun_tt
-        sun.compute(obs)
-        z = sun.alt/ephem.degrees('-18:00:00')
-        if z>1 : z=1
-        if z<0 : z=0
-        z = z*z # this makes the twilight more prominent
-        gdata.append([x, y, z])
-
-# XXX I found the magic numbers below by trial error
-g = graph.graphxyz(size=1, xpos=11, ypos=16.73, xscale=12, yscale=18.31,
-        projector=graph.graphxyz.parallel(-90, 90),
-        x=graph.axis.linear(min=-1, max=chart.width+1, painter=None),
-        y=graph.axis.linear(min=-1, max=chart.height+1, painter=None),
-        z=graph.axis.linear(min=-1, max=2, painter=None))
-g.plot(graph.data.points(gdata, x=1, y=2, z=3, color=3),
-       [graph.style.surface(gradient=DNcolgrad,
-                            gridcolor=None,
-                            backcolor=color.rgb.black)])
-clc.insert(g)
-# the following if for the debugging the graph above
-#c.stroke(path.line(0, 0, chart.width, chart.height), [color.cmyk.Red])
+#gdata = []
+#for doy in range(0, no_days, 10) :
+#    for tt in range(16*6+1) : # for 16 hours, every 10 minutes
+#        sun_tt = chart.ULcorn + doy + tt*ephem.minute*10
+#        x, y = to_chart_coord(sun_tt, chart)
+#        obs.date = sun_tt
+#        sun.compute(obs)
+#        z = sun.alt/ephem.degrees('-18:00:00')
+#        if z>1 : z=1
+#        if z<0 : z=0
+#        z = z*z # this makes the twilight more prominent
+#        gdata.append([x, y, z])
+#
+## XXX I found the magic numbers below by trial error
+#g = graph.graphxyz(size=1, xpos=11, ypos=16.73, xscale=12, yscale=18.31,
+#        projector=graph.graphxyz.parallel(-90, 90),
+#        x=graph.axis.linear(min=-1, max=chart.width+1, painter=None),
+#        y=graph.axis.linear(min=-1, max=chart.height+1, painter=None),
+#        z=graph.axis.linear(min=-1, max=2, painter=None))
+#g.plot(graph.data.points(gdata, x=1, y=2, z=3, color=3),
+#       [graph.style.surface(gradient=DNcolgrad,
+#                            gridcolor=None,
+#                            backcolor=color.rgb.black)])
+#clc.insert(g)
+## the following is for the debugging the graph above
+##c.stroke(path.line(0, 0, chart.width, chart.height), [color.cmyk.Red])
 
 # vertical dots
 # left side is 4pm, right side is 8am. We will draw dots every 1/2 hour
@@ -351,23 +357,109 @@ for sunday in range(first_sun, no_days, 7) :
     c.text(eve_x+0.2, y, '%s' % (eve_date.day),
             [text.halign.left, text.valign.middle])
 
-#c.stroke(path.line(6, 0, 6, 34),
-#        [style.linestyle(style.linecap.round, style.dash([0, 2.6331]))])
-#c.stroke(path.line(7, 0, 7, 34),
-#        [style.linestyle(style.linecap.round, style.dash([0, 2.6332]))])
-#c.stroke(path.line(8, 0, 8, 34),
-#        [style.linestyle(style.linecap.round, style.dash([0, 2.6333]))])
-#c.stroke(path.line(9, 0, 9, 34),
-#        [style.linestyle(style.linecap.round, style.dash([0, 2.6334]))])
-
 # Twilight lines
 clc.stroke(event_to_path(eve_twilight, chart),
            [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
 clc.stroke(event_to_path(mor_twilight, chart),
            [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
+
+
+# aaaaa
+def add_text_to_path(canv, chart, ev, pos,
+        offset=0, sep=1.1, rotate=False, txt1='~', txt2='~',
+        txt_color=color.cmyk.Gray) :
+    '''Adding text to a given event path.
+       ev: event list that forms the path
+       pos: a number 0<=x<=1 determining the position of the text along
+       the path
+       rotate: if True, rotate the text 180 degrees
+       txt1: text to go over the path
+       txt2: text to go below the path
+    '''
+    n = len(ev)
+    k = int(round(pos*n))
+    if k==0 :
+        mid = ev[0]
+        aft = ev[1]
+        x, y = to_chart_coord(mid, chart)
+        xa, ya = to_chart_coord(aft, chart)
+        slope = atan2(y-ya, x-xa)
+    elif k>=n-1 :
+        bef = ev[n-2]
+        mid = ev[n-1]
+        xb, yb = to_chart_coord(bef, chart)
+        x, y = to_chart_coord(mid, chart)
+        slope = atan2(yb-y, xb-x)
+    else :
+        bef = ev[k-1]
+        mid = ev[k]
+        aft = ev[k+1]
+        xb, yb = to_chart_coord(bef, chart)
+        x, y = to_chart_coord(mid, chart)
+        xa, ya = to_chart_coord(aft, chart)
+        slope = atan2(yb-ya, xb-xa)
+    rot_angle = slope*180.0/PI
+    if rotate==True :
+        rot_angle += 180.0
+#    canv.text(x+offset*sin(slope),
+#              y+offset*cos(slope),
+#            r'{\small\sffamily %s}' %
+#            (txt1),
+#            [
+#             text.halign.center,text.valign.bottom,
+#             pyx.trafo.rotate(rot_angle),
+#             color.cmyk.Red])
+#    canv.text(x, y,
+#              r'{\small\sffamily %s}' % (txt1),
+#              [
+#               text.halign.center,text.valign.bottom,
+#               color.cmyk.Red])
+    canv.text(x, y,
+              r'\raisebox{%gpt}{\small\sffamily %s}' % (3+offset,txt1),
+              [
+               text.halign.center,text.valign.bottom,
+               pyx.trafo.rotate(rot_angle),
+               txt_color])
+    canv.text(x, y,
+              r'\raisebox{%gpt}{\small\sffamily %s}' % (-6+offset,txt2),
+              [
+               text.halign.center,text.valign.top,
+               pyx.trafo.rotate(rot_angle),
+               txt_color])
+#    canv.stroke(path.line(x,y,x+2.0*cos(slope),y+2.0*sin(slope)))
+#    canv.stroke(path.line(x,y,x-2.0*sin(slope),y+2.0*cos(slope)))
+
 # Planets etc.
+mercury.rising_text = [
+[0.06, 'Merkür', 'doğuyor', -1, True],
+[0.34, 'Merkür', 'doğuyor', -1, False],
+[0.595, 'Merkür', 'doğuyor', -1, False],
+[0.89, 'Merkür', 'doğuyor', -1, False]
+]
+venus.rising_text = [
+[0.78, 'Venüs doğuyor', '~', -1, True]
+]
+mars.rising_text = [
+[0.1, 'Mars doğuyor', '~', 0, False]
+]
+jupiter.rising_text = [
+[0.62, 'Jüpiter doğuyor', '~', 0, False]
+]
+saturn.rising_text = [
+[0.15, 'SJüpiter doğuyor', '~', 0, False]
+]
+uranus.rising_text = [
+[0.45, 'Uranüs', 'doğuyor', -1, False]
+]
+neptune.rising_text = [
+[0.4, 'Neptün doğuyor', '~', 0, False]
+]
 for rb in rising_bodies :
     clc.stroke(event_to_path(rb.rising, chart), [rb.color])
+    for rstxt in rb.rising_text :
+        add_text_to_path(clc, chart, rb.rising, rstxt[0],
+                txt1=rstxt[1], txt2=rstxt[2], offset=rstxt[3],
+                rotate=rstxt[4], txt_color=rb.color)
 for tb in transit_bodies :
     clc.stroke(event_to_path(tb.transit, chart), [tb.color])
 for sb in setting_bodies :
@@ -375,110 +467,110 @@ for sb in setting_bodies :
 
 c.insert(clc)
 
-# Moon
-moon = ephem.Moon()
-moon2 = ephem.Moon()
-mooncolorlight = color.rgb(0.6235294,0.6823529,0.827451)
-mooncolordark = color.rgb(0.3450980,0.3764706,0.458823)
-
-def S_of_R(R) :
-    return (R*R*asin(1.0/R) - 1.0*sqrt(R*R-1.0))/ (PI)
-
-def R_of_S(S) :
-    def func(x) :
-        return S_of_R(x)-S
-    return optimize.bisect(func, 1.0000001, 100.0)
-
-def first_quarter_moon(r, cx, cy) :
-    p = path.path(path.moveto(cx, cy))
-    p.append(path.arc(cx, cy, r, -90, 90))
-    p.append(path.closepath())
-    return p
-def last_quarter_moon(r, cx, cy) :
-    p = path.path(path.moveto(cx, cy))
-    p.append(path.arc(cx, cy, r, 90, -90))
-    p.append(path.closepath())
-    return p
-
-def waxing_moon(X, r, cx, cy) :
-    '''draws a waxing moon figure, used for moonset.'''
-    p = path.path(path.moveto(cx, cy-r))
-    p.append(path.arc(cx, cy, r, -90, 90))
-    if X>0.5 :
-        R = R_of_S(X-0.5)*r
-        theta = asin(r/R)*180/PI
-        moon_arc_p = path.arc(cx+sqrt(R*R-r*r), cy, R, 180-theta, 180+theta)
-    else :
-        R = R_of_S(0.5-X)*r
-        theta = asin(r/R)*180/PI
-        moon_arc_p = path.arc(cx-sqrt(R*R-r*r), cy, R, -theta, theta)
-        p = path.path.reversed(p)
-    p.append(moon_arc_p)
-    return p
-
-def waning_moon(X, r, cx, cy) :
-    '''draws a waning moon figure, used for moonrise.'''
-    p = path.path(path.moveto(cx, cy+r))
-    p.append(path.arc(cx, cy, r, 90, -90))
-    if X>0.5 :
-        R = R_of_S(X-0.5)*r
-        theta = asin(r/R)*180/PI
-        moon_arc_p = path.arc(cx-sqrt(R*R-r*r), cy, R, -theta, theta)
-    else :
-        R = R_of_S(0.5-X)*r
-        theta = asin(r/R)*180/PI
-        moon_arc_p = path.arc(cx+sqrt(R*R-r*r), cy, R, 180-theta, 180+theta)
-        p = path.path.reversed(p)
-    p.append(moon_arc_p)
-    return p
-
-for doy in range(no_days) :
-    obs.date = begin_day + doy
-    mpc = obs.date + 0.5 # moon phase check
-    moon_set = obs.next_setting(moon)
-    moon2.compute(moon_set)
-    X = moon2.moon_phase
-    # Waxing moon (moonsets)
-    x, y = to_chart_coord(moon_set, chart)
-    if (fabs(ephem.next_full_moon(mpc) - mpc) < 0.5 or
-        fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
-        # full moon
-        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-    elif ((X < 0.55 and X > 0.45) or 
-          fabs(ephem.next_first_quarter_moon(mpc) - mpc) < 0.5 or
-          fabs(ephem.previous_first_quarter_moon(mpc) - mpc) < 0.5) :
-        # first quarter
-        mclc.stroke(first_quarter_moon(0.12, x,y),[mooncolordark,pyx.deco.filled([mooncolordark])])
-    elif (fabs(ephem.next_new_moon(mpc) - mpc) < 0.5 or
-          fabs(ephem.previous_new_moon(mpc) - mpc) < 0.5):
-        # new moon
-        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
-    else :
-        mclc.fill(waxing_moon(X, 0.08, x, y),
-                [style.linejoin.bevel,mooncolordark])
-    # Waning moon (moonrises)
-    moon_rise = obs.next_rising(moon)
-    moon2.compute(moon_rise)
-    X = moon2.moon_phase
-    x, y = to_chart_coord(moon_rise, chart)
-    if (fabs(ephem.next_full_moon(mpc) - mpc) < 0.5 or
-        fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
-        # full moon
-        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-    elif ((X < 0.55 and X > 0.45) or 
-          fabs(ephem.next_last_quarter_moon(mpc) - mpc) < 0.5 or
-          fabs(ephem.previous_last_quarter_moon(mpc) - mpc) < 0.5) :
-        # last quarter
-        mclc.stroke(last_quarter_moon(0.12, x,y),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-    elif (fabs(ephem.next_new_moon(mpc) - mpc) < 0.5 or
-          fabs(ephem.previous_new_moon(mpc) - mpc) < 0.5):
-        # new moon
-        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
-    else :
-        mclc.fill(waning_moon(X, 0.08, x, y),
-                [style.linejoin.bevel,mooncolorlight])
-
-c.insert(mclc)
+## Moon
+#moon = ephem.Moon()
+#moon2 = ephem.Moon()
+#mooncolorlight = color.rgb(0.6235294,0.6823529,0.827451)
+#mooncolordark = color.rgb(0.3450980,0.3764706,0.458823)
+#
+#def S_of_R(R) :
+#    return (R*R*asin(1.0/R) - 1.0*sqrt(R*R-1.0))/ (PI)
+#
+#def R_of_S(S) :
+#    def func(x) :
+#        return S_of_R(x)-S
+#    return optimize.bisect(func, 1.0000001, 100.0)
+#
+#def first_quarter_moon(r, cx, cy) :
+#    p = path.path(path.moveto(cx, cy))
+#    p.append(path.arc(cx, cy, r, -90, 90))
+#    p.append(path.closepath())
+#    return p
+#def last_quarter_moon(r, cx, cy) :
+#    p = path.path(path.moveto(cx, cy))
+#    p.append(path.arc(cx, cy, r, 90, -90))
+#    p.append(path.closepath())
+#    return p
+#
+#def waxing_moon(X, r, cx, cy) :
+#    '''draws a waxing moon figure, used for moonset.'''
+#    p = path.path(path.moveto(cx, cy-r))
+#    p.append(path.arc(cx, cy, r, -90, 90))
+#    if X>0.5 :
+#        R = R_of_S(X-0.5)*r
+#        theta = asin(r/R)*180/PI
+#        moon_arc_p = path.arc(cx+sqrt(R*R-r*r), cy, R, 180-theta, 180+theta)
+#    else :
+#        R = R_of_S(0.5-X)*r
+#        theta = asin(r/R)*180/PI
+#        moon_arc_p = path.arc(cx-sqrt(R*R-r*r), cy, R, -theta, theta)
+#        p = path.path.reversed(p)
+#    p.append(moon_arc_p)
+#    return p
+#
+#def waning_moon(X, r, cx, cy) :
+#    '''draws a waning moon figure, used for moonrise.'''
+#    p = path.path(path.moveto(cx, cy+r))
+#    p.append(path.arc(cx, cy, r, 90, -90))
+#    if X>0.5 :
+#        R = R_of_S(X-0.5)*r
+#        theta = asin(r/R)*180/PI
+#        moon_arc_p = path.arc(cx-sqrt(R*R-r*r), cy, R, -theta, theta)
+#    else :
+#        R = R_of_S(0.5-X)*r
+#        theta = asin(r/R)*180/PI
+#        moon_arc_p = path.arc(cx+sqrt(R*R-r*r), cy, R, 180-theta, 180+theta)
+#        p = path.path.reversed(p)
+#    p.append(moon_arc_p)
+#    return p
+#
+#for doy in range(no_days) :
+#    obs.date = begin_day + doy
+#    mpc = obs.date + 0.5 # moon phase check
+#    moon_set = obs.next_setting(moon)
+#    moon2.compute(moon_set)
+#    X = moon2.moon_phase
+#    # Waxing moon (moonsets)
+#    x, y = to_chart_coord(moon_set, chart)
+#    if (fabs(ephem.next_full_moon(mpc) - mpc) < 0.5 or
+#        fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
+#        # full moon
+#        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+#    elif ((X < 0.55 and X > 0.45) or 
+#          fabs(ephem.next_first_quarter_moon(mpc) - mpc) < 0.5 or
+#          fabs(ephem.previous_first_quarter_moon(mpc) - mpc) < 0.5) :
+#        # first quarter
+#        mclc.stroke(first_quarter_moon(0.12, x,y),[mooncolordark,pyx.deco.filled([mooncolordark])])
+#    elif (fabs(ephem.next_new_moon(mpc) - mpc) < 0.5 or
+#          fabs(ephem.previous_new_moon(mpc) - mpc) < 0.5):
+#        # new moon
+#        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
+#    else :
+#        mclc.fill(waxing_moon(X, 0.08, x, y),
+#                [style.linejoin.bevel,mooncolordark])
+#    # Waning moon (moonrises)
+#    moon_rise = obs.next_rising(moon)
+#    moon2.compute(moon_rise)
+#    X = moon2.moon_phase
+#    x, y = to_chart_coord(moon_rise, chart)
+#    if (fabs(ephem.next_full_moon(mpc) - mpc) < 0.5 or
+#        fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
+#        # full moon
+#        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+#    elif ((X < 0.55 and X > 0.45) or 
+#          fabs(ephem.next_last_quarter_moon(mpc) - mpc) < 0.5 or
+#          fabs(ephem.previous_last_quarter_moon(mpc) - mpc) < 0.5) :
+#        # last quarter
+#        mclc.stroke(last_quarter_moon(0.12, x,y),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+#    elif (fabs(ephem.next_new_moon(mpc) - mpc) < 0.5 or
+#          fabs(ephem.previous_new_moon(mpc) - mpc) < 0.5):
+#        # new moon
+#        mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
+#    else :
+#        mclc.fill(waning_moon(X, 0.08, x, y),
+#                [style.linejoin.bevel,mooncolorlight])
+#
+#c.insert(mclc)
 
 # hour labels (from 5pm to 7am)
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
