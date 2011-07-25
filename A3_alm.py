@@ -25,7 +25,7 @@ from pyx import path, canvas, color, style, text, graph
 from scipy import optimize
 
 from almanac_bg import *
-from almanac_utils import to_chart_coord
+from almanac_utils import *
 
 PI = atan(1)*4.0
 mnt_names = ['sıfırıncı', 'Ocak', 'Şubat', 'Mart',
@@ -33,6 +33,11 @@ mnt_names = ['sıfırıncı', 'Ocak', 'Şubat', 'Mart',
           'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
 mnt_shortnames = ['SFR', 'OCA', 'ŞUB', 'MAR', 'NİS', 'MAY',
                'HAZ', 'TEM', 'AĞU', 'EYL', 'EKİ', 'KAS', 'ARA']
+
+# Local stuff: Here we set the observer's location, timezone and DST
+# conventions.
+# In addition we set the year for the chart, the limits for the chart,
+# and make arrangements for the twilight lines.
 
 obs = ephem.Observer()
 # bodrum
@@ -52,6 +57,25 @@ if calendar.isleap(year) :
     no_days = 367
 else :
     no_days = 366
+
+for first_sunday in range(1,8) :
+    if calendar.weekday(year, 1, first_sunday) == calendar.SUNDAY :
+        break
+first_sunday_datetime = datetime.datetime(year, 1, first_sunday, 12, tzinfo=obsTZ)
+
+## In Turkey (and in most of Europe), DST rules are:
+## Start: Last Sunday in March
+## End: Last Sunday in October
+## Time: 1.00 am (01:00) Greenwich Mean Time (GMT)
+## http://wwp.greenwichmeantime.com/time-zone/rules/eu/index.htm
+#for week in range(53) :
+#    sunday_datetime = first_sunday_datetime + TD(days=7*week)
+#    if (sunday_datetime.month == 3 and
+#        (sunday_datetime+TD(days=7)).month == 4) :
+#        dst_begin = ephem.Date(sunday_datetime.astimezone(utcTZ))
+#    if (sunday_datetime.month == 10 and
+#        (sunday_datetime+TD(days=7)).month == 11) :
+#        dst_end = ephem.Date(sunday_datetime.astimezone(utcTZ))
 
 class Chart() :
     pass
@@ -86,9 +110,11 @@ for doy in range(no_days) :
 
 # Objects to be plotted on the chart
 class PyEph_body() :
-    def __init__(self, pyephem_name, clr=color.cmyk.Gray) :
+    def __init__(self, pyephem_name, clr=color.cmyk.Gray,
+            symbol='~') :
         self.body = pyephem_name
         self.color = clr
+        self.symbol = symbol
         self.rising = []
         self.rising_text = []
         self.transit = []
@@ -148,46 +174,6 @@ for doy in range(no_days+3) :
     for sb in setting_bodies :
         sb.update_setting(obs)
 
-def event_to_path(event, chart) :
-    '''accepts an array of points representing an event, converts this
-       event to a path'''
-    x, y = to_chart_coord(event[0], chart)
-    p = path.path(path.moveto(x,y))
-    for e in event[1:] :
-        old_x = x
-        old_y = y
-        x, y = to_chart_coord(e, chart)
-        if (fabs(old_x - x) < chart.width/2.0  and
-            fabs(old_y - y) < chart.height/2.0) :  
-            p.append(path.lineto(x, y))
-        else :
-            p.append(path.moveto(x, y))
-    return p
-
-def event_to_path_no_check(event, chart) :
-    '''accepts an array of points representing an event, converts this
-       event to a path. this version does not check for big jumps in x
-       coordinate'''
-    x, y = to_chart_coord(event[0], chart)
-    p = path.path(path.moveto(x,y))
-    for e in event[1:] :
-        old_x = x
-        x, y = to_chart_coord(e, chart)
-        p.append(path.lineto(x, y))
-    return p
-
-def event_to_path_no_check_with_offset(event, chart, xoffset=0.0, yoffset=0.0) :
-    '''accepts an array of points representing an event, converts this
-       event to a path. this version does not check for big jumps in x
-       coordinate'''
-    x, y = to_chart_coord(event[0], chart)
-    p = path.path(path.moveto(x+xoffset,y+yoffset))
-    for e in event[1:] :
-        old_x = x
-        x, y = to_chart_coord(e, chart)
-        p.append(path.lineto(x+xoffset, y+yoffset))
-    return p
-
 pyx.unit.set(defaultunit='cm')
 pyx.text.set(mode='latex')
 pyx.text.preamble(r'\usepackage[utf8x]{inputenc}')
@@ -210,50 +196,33 @@ bot_line = path.path(path.moveto(llx, lly),
 
 rev_sun_set = sun_set[:]
 rev_sun_set.reverse()
-clippath = event_to_path_no_check(rev_sun_set[:] + sun_rise[:], chart)
+clippath = event_to_path(rev_sun_set[:] + sun_rise[:], chart, do_check=False)
 clippath.append(path.closepath())
 
 clc = canvas.canvas([canvas.clip(clippath)]) # clipped canvas for paths, text and moon
 bclc = canvas.canvas([canvas.clip(clippath)]) # clipped canvas for the background and the dots
 
 # a seperate (larger) clipping canvas for Moon phases
-clippath2 = event_to_path_no_check_with_offset([rev_sun_set[0]+2.0] +
-        rev_sun_set[:] + [rev_sun_set[-1]-2.0], chart,
+clippath2 = event_to_path([rev_sun_set[0]+2.0] +
+        rev_sun_set[:] + [rev_sun_set[-1]-2.0], chart, do_check=False,
             xoffset=-1.3)
-clippath2 = clippath2.joined(event_to_path_no_check_with_offset([sun_rise[0]-2.0] +
-            sun_rise[:] + [sun_rise[-1]+2.0], chart, xoffset=1.3))
+clippath2 = clippath2.joined(event_to_path([sun_rise[0]-2.0] +
+            sun_rise[:] + [sun_rise[-1]+2.0], chart, do_check=False,
+            xoffset=1.3))
 clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
-for first_sunday in range(1,8) :
-    if calendar.weekday(year, 1, first_sunday) == calendar.SUNDAY :
-        break
-make_alm_bg(bclc, begin_day_datetime, no_days, chart, obs,
-        sun, sun_set, sun_rise) 
+#make_alm_bg(bclc, begin_day_datetime, no_days, chart,
+#        obs, sun, sun_set, sun_rise) 
 make_alm_bg_vdots(bclc, first_sunday, no_days, chart) 
 make_alm_bg_hdots(bclc, first_sunday, no_days, chart) 
 
-# Days of the month, printed on Sunday evenings and Monday mornings
-for sunday in range(first_sunday, no_days, 7) :
-    x1 = 0
-    x2 = chart.width
-    y = chart.height - (sunday * chart.height / no_days)
-    mor_date = begin_day_datetime + TD(days=sunday, hours=4)
-    mor_x, mor_y = to_chart_coord(sun_set[sunday], chart)
-    eve_date = begin_day_datetime + TD(days=sunday, hours=16)
-    eve_x, eve_y = to_chart_coord(sun_rise[sunday], chart)
-    c.text(mor_x-0.2, y, '%s' % (mor_date.day),
-            [text.halign.right, text.valign.middle])
-    c.text(eve_x+0.2, y, '%s' % (eve_date.day),
-            [text.halign.left, text.valign.middle])
 # Twilight lines
 clc.stroke(event_to_path(eve_twilight, chart),
            [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
 clc.stroke(event_to_path(mor_twilight, chart),
            [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
 
-
-# aaaaa
 def add_text_to_path(canv, chart, ev, pos,
         offset=0, sep=1.1, rotate=False, txt1='~', txt2='~',
         txt_color=color.cmyk.Gray) :
@@ -512,8 +481,8 @@ for sb in setting_bodies :
 
 
 c.insert(bclc)
-c.insert(clc)
 c.insert(mclc)
+c.insert(clc)
 
 # hour labels (from 5pm to 7am)
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
@@ -539,6 +508,33 @@ x = chart.width*9.0/12.0
 c.text(x, y1, 'SABAH', [text.halign.center, text.valign.baseline])
 c.text(x, y2, 'SABAH', [text.halign.center, text.valign.baseline])
 
+## background colouring around the chart to indicate DST
+#outDST_col = color.rgb(205.0/255.0, 205.0/255.0, 1.0)
+#inDST_col  = color.rgb(241.0/255.0, 215.0/255.0, 241.0/255.0)
+#dst_beg_day = int(round(dst_begin-begin_day))
+#dst_end_day = int(round(dst_end-begin_day))
+#p1 = event_to_path(sun_set[:dst_beg_day], chart, do_check=False)
+#p1 = p1.joined(event_to_path(rev_sun_set[-dst_beg_day:],
+#            chart, do_check=False, xoffset=-1.4))
+#p1.append(path.closepath())
+#c.fill(p1, [outDST_col])
+#p2 = event_to_path(sun_set[dst_beg_day:dst_end_day], chart, do_check=False)
+#p2 = p2.joined(event_to_path(rev_sun_set[-dst_end_day:-dst_beg_day], chart, do_check=False, xoffset=-1.4))
+#p2.append(path.closepath())
+#c.fill(p2, [inDST_col])
+# Days of the month, printed on Sunday evenings and Monday mornings
+for sunday in range(first_sunday, no_days, 7) :
+    x1 = 0
+    x2 = chart.width
+    y = chart.height - (sunday * chart.height / no_days)
+    mor_date = begin_day_datetime + TD(days=sunday, hours=4)
+    mor_x, mor_y = to_chart_coord(sun_set[sunday], chart)
+    eve_date = begin_day_datetime + TD(days=sunday, hours=16)
+    eve_x, eve_y = to_chart_coord(sun_rise[sunday], chart)
+    c.text(mor_x-0.2, y, '%s' % (mor_date.day),
+            [text.halign.right, text.valign.middle])
+    c.text(eve_x+0.2, y, '%s' % (eve_date.day),
+            [text.halign.left, text.valign.middle])
 # month labels
 for i in range(1,13) :
     dt1_datetime = datetime.datetime(year, i, 14, 12, tzinfo=obsTZ) 
