@@ -111,10 +111,11 @@ for doy in range(no_days) :
 # Objects to be plotted on the chart
 class PyEph_body() :
     def __init__(self, pyephem_name, clr=color.cmyk.Gray,
-            symbol='~') :
+            symbol='~', tsize='small') :
         self.body = pyephem_name
         self.color = clr
         self.symbol = symbol
+        self.tsize = tsize
         self.rising = []
         self.rising_text = []
         self.transit = []
@@ -139,10 +140,11 @@ neptune = PyEph_body(ephem.Neptune(), color.cmyk.ForestGreen)
 m13 = PyEph_body(ephem.readdb("M13,f|C,16:41:42,36:28,5.9,2000,996"))
 m31 = PyEph_body(ephem.readdb("M31,f|G,0:42:44,+41:16:8,4.16,2000,11433|3700|35"))
 m42 = PyEph_body(ephem.readdb("M42,f|U,05:35:18,-05:23,4,2000,3960"))
-m45 = PyEph_body(ephem.readdb("M45,f|U,03:47:0,24:07,1.2,2000,6000"))
+m45 = PyEph_body(ephem.readdb("M45,f|U,03:47:0,24:07,1.2,2000,6000"),
+        symbol='m45', tsize='tiny')
 # some bright stars
 sirius     = PyEph_body(ephem.star('Sirius'))
-antares    = PyEph_body(ephem.star('Regulus'))
+antares    = PyEph_body(ephem.star('Regulus'), symbol='Ant', tsize='tiny')
 deneb      = PyEph_body(ephem.star('Deneb'))
 betelgeuse = PyEph_body(ephem.star('Betelgeuse'))
 pollux     = PyEph_body(ephem.star('Pollux'))
@@ -157,10 +159,15 @@ transit_bodies = [mars, jupiter, uranus, neptune,
                   m13, m31, m42, m45,
                   sirius, antares, deneb, betelgeuse, pollux]
 
-rising_bodies  = [mercury, venus, mars, jupiter, saturn, uranus, neptune]
-setting_bodies = [mercury, venus, mars, jupiter, saturn, uranus, neptune]
-transit_bodies = [mars, jupiter, saturn, uranus, neptune]
-
+rising_bodies  = [antares,
+                  m45,
+                  mercury, venus, mars, jupiter, saturn, uranus, neptune]
+setting_bodies = [antares,
+                  m45,
+                  mercury, venus, mars, jupiter, saturn, uranus, neptune]
+transit_bodies = [antares,
+                  m45,
+                  mars, jupiter, saturn, uranus, neptune]
 
 # XXX the +3, -3 bug fix below is a mystery to me,
 # XXX but it seems necessary. this probably points out to a deeper
@@ -212,8 +219,8 @@ clippath2 = clippath2.joined(event_to_path([sun_rise[0]-2.0] +
 clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
-#make_alm_bg(bclc, begin_day_datetime, no_days, chart,
-#        obs, sun, sun_set, sun_rise) 
+make_alm_bg(bclc, begin_day_datetime, no_days, chart,
+        obs, sun, sun_set, sun_rise) 
 make_alm_bg_vdots(bclc, first_sunday, no_days, chart) 
 make_alm_bg_hdots(bclc, first_sunday, no_days, chart) 
 
@@ -225,7 +232,7 @@ clc.stroke(event_to_path(mor_twilight, chart),
 
 def add_text_to_path(canv, chart, ev, pos,
         offset=0, sep=1.1, rotate=False, txt1='~', txt2='~',
-        txt_color=color.cmyk.Gray) :
+        txt_color=color.cmyk.Gray, txt_size='small') :
     '''Adding text to a given event path.
        ev: event list that forms the path
        pos: a number 0<=x<=1 determining the position of the text along
@@ -259,26 +266,27 @@ def add_text_to_path(canv, chart, ev, pos,
     rot_angle = slope*180.0/PI
     if rotate==True :
         rot_angle += 180.0
-#    canv.text(x+offset*sin(slope),
-#              y+offset*cos(slope),
-#            r'{\small\sffamily %s}' %
-#            (txt1),
-#            [
-#             text.halign.center,text.valign.bottom,
-#             pyx.trafo.rotate(rot_angle),
-#             color.cmyk.Red])
-#    canv.text(x, y,
-#              r'{\small\sffamily %s}' % (txt1),
-#              [
-#               text.halign.center,text.valign.bottom,
-#               color.cmyk.Red])
-    canv.text(x, y,
+    if txt_size=='tiny' :
+        canv.text(x, y,
+              r'\raisebox{%gpt}{\footnotesize\sffamily %s}' % (3+offset,txt1),
+              [
+               text.halign.center,text.valign.bottom,
+               pyx.trafo.rotate(rot_angle),
+               txt_color])
+        canv.text(x, y,
+              r'\raisebox{%gpt}{\footnotesize\sffamily %s}' % (-6+offset,txt2),
+              [
+               text.halign.center,text.valign.top,
+               pyx.trafo.rotate(rot_angle),
+               txt_color])
+    else :
+        canv.text(x, y,
               r'\raisebox{%gpt}{\small\sffamily %s}' % (3+offset,txt1),
               [
                text.halign.center,text.valign.bottom,
                pyx.trafo.rotate(rot_angle),
                txt_color])
-    canv.text(x, y,
+        canv.text(x, y,
               r'\raisebox{%gpt}{\small\sffamily %s}' % (-6+offset,txt2),
               [
                text.halign.center,text.valign.top,
@@ -391,6 +399,13 @@ for doy in range(no_days) :
                 [style.linejoin.bevel,mooncolorlight])
 
 # Planets etc.
+for rb in rising_bodies :
+    clc.stroke(event_to_path(rb.rising, chart), [rb.color])
+for sb in setting_bodies :
+    clc.stroke(event_to_path(sb.setting, chart), [sb.color])
+for tb in transit_bodies :
+    clc.stroke(event_to_path(tb.transit, chart), [tb.color])
+
 mercury.rising_text = [
 [0.06, 'Merkür', 'doğuyor', -1, True],
 [0.34, 'Merkür', 'doğuyor', -1, False],
@@ -414,16 +429,23 @@ uranus.rising_text = [
 [0.45, 'Uranüs', 'doğuyor', -1, False]
 ]
 neptune.rising_text = [
-[0.4, 'Neptün doğuyor', '~', 0, False]
+[0.4, '~', 'Neptün doğuyor', -1, False]
+]
+m45.rising_text = [
+[0.57, 'M45 doğuyor', '~', 0, False]
+]
+antares.rising_text = [
+[0.1, 'Antares doğuyor', '~', 0, False],
+[0.87, 'Antares doğuyor', '~', 0, False]
 ]
 for rb in rising_bodies :
-    clc.stroke(event_to_path(rb.rising, chart), [rb.color])
     for rstxt in rb.rising_text :
         add_text_to_path(clc, chart, rb.rising, rstxt[0],
                 txt1=rstxt[1], txt2=rstxt[2], offset=rstxt[3],
-                rotate=rstxt[4], txt_color=rb.color)
+                rotate=rstxt[4], txt_color=rb.color, txt_size=rb.tsize)
+
 mars.transit_text = [
-[0.1, 'Mars meridyende', '~', 0, False]
+[0.1, '~', 'Mars meridyende', -1, False]
 ]
 jupiter.transit_text = [
 [0.06, 'Jüpiter', 'meridyende', -1, False],
@@ -439,12 +461,20 @@ uranus.transit_text = [
 neptune.transit_text = [
 [0.67, '~', 'Neptün meridyende', -1, False]
 ]
+m45.transit_text = [
+[0.08, '~', 'M45 meridyende', -1, False],
+[0.83, '~', 'M45 meridyende', -1, False]
+]
+antares.transit_text = [
+[0.18, 'Antares meridyende', '~', 0, False],
+[0.96, 'Antares', 'meridyende', -1, False]
+]
 for tb in transit_bodies :
-    clc.stroke(event_to_path(tb.transit, chart), [tb.color])
     for tstxt in tb.transit_text :
         add_text_to_path(clc, chart, tb.transit, tstxt[0],
                 txt1=tstxt[1], txt2=tstxt[2], offset=tstxt[3],
-                rotate=tstxt[4], txt_color=tb.color)
+                rotate=tstxt[4], txt_color=tb.color, txt_size=tb.tsize)
+
 mercury.setting_text = [
 [0.16, 'Merkür', 'batıyor', -1, True],
 [0.52, 'Merkür', 'batıyor', -1, False],
@@ -469,20 +499,56 @@ uranus.setting_text = [
 [0.94, 'Uranüs batıyor', '~', 0, False]
 ]
 neptune.setting_text = [
-[0.07, 'Neptün batıyor', '~', 0, False],
+[0.05, '~', 'Neptün batıyor', -1, False],
 [0.94, 'Neptün batıyor', '~', 0, False]
 ]
+m45.setting_text = [
+[0.35, 'M45 batıyor', '~', 0, False],
+[0.97, 'M45 batıyor', '~', 0, False]
+]
+antares.setting_text = [
+[0.45, 'Antares batıyor', '~', 0, False]
+]
 for sb in setting_bodies :
-    clc.stroke(event_to_path(sb.setting, chart), [sb.color])
     for sttxt in sb.setting_text :
         add_text_to_path(clc, chart, sb.setting, sttxt[0],
                 txt1=sttxt[1], txt2=sttxt[2], offset=sttxt[3],
-                rotate=sttxt[4], txt_color=sb.color)
-
+                rotate=sttxt[4], txt_color=sb.color, txt_size=sb.tsize)
 
 c.insert(bclc)
 c.insert(mclc)
 c.insert(clc)
+
+def body_path_calibrator(canv, bd) :
+    # rising
+    canv.stroke(event_to_path(bd.rising, chart), [bd.color])
+    for x in [i/10.0 for i in range(1,10)] :
+        add_text_to_path(canv, chart, bd.rising, x,
+                txt1=bd.symbol,txt2=('%g'%(x)),txt_color=bd.color,
+                txt_size=bd.tsize)
+    for x in [i/10.0+0.05 for i in range(0,10)] :
+        add_text_to_path(canv, chart, bd.rising, x,
+                txt1='R',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
+    # transit
+    canv.stroke(event_to_path(bd.transit, chart), [bd.color])
+    for x in [i/10.0 for i in range(1,10)] :
+        add_text_to_path(canv, chart, bd.transit, x,
+                txt1=bd.symbol,txt2=('%g'%(x)),txt_color=bd.color,
+                txt_size=bd.tsize)
+    for x in [i/10.0+0.05 for i in range(0,10)] :
+        add_text_to_path(canv, chart, bd.transit, x,
+                txt1='T',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
+    # setting
+    canv.stroke(event_to_path(bd.setting, chart), [bd.color])
+    for x in [i/10.0 for i in range(1,10)] :
+        add_text_to_path(canv, chart, bd.setting, x,
+                txt1=bd.symbol,txt2=('%g'%(x)),txt_color=bd.color,
+                txt_size=bd.tsize)
+    for x in [i/10.0+0.05 for i in range(0,10)] :
+        add_text_to_path(canv, chart, bd.setting, x,
+                txt1='S',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
+
+# body_path_calibrator(c, antares)
 
 # hour labels (from 5pm to 7am)
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
