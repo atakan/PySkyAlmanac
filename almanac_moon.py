@@ -26,6 +26,9 @@ from scipy import optimize
 
 from almanac_utils import *
 
+mooncolorlight = color.rgb(0.6235294,0.6823529,0.827451)
+mooncolordark = color.rgb(0.3450980,0.3764706,0.458823)
+
 def S_of_R(R) :
     return (R*R*asin(1.0/R) - 1.0*sqrt(R*R-1.0))/ (PI)
 
@@ -81,8 +84,6 @@ def make_moon_stuff(outer_canv, inner_canv, begin_day, no_days, chart,
         obs):
     moon = ephem.Moon()
     moon2 = ephem.Moon()
-    mooncolorlight = color.rgb(0.6235294,0.6823529,0.827451)
-    mooncolordark = color.rgb(0.3450980,0.3764706,0.458823)
     for doy in range(no_days) :
         obs.date = begin_day + doy
         mpc = obs.date + 0.5 # moon phase check
@@ -128,3 +129,29 @@ def make_moon_stuff(outer_canv, inner_canv, begin_day, no_days, chart,
         else :
             inner_canv.fill(waning_moon(X, 0.08, x, y),
                     [style.linejoin.bevel,mooncolorlight])
+
+def make_moon_key(canv, chart) :
+    x = 0.0
+    y = -1.8
+    canv.fill(path.rect(x, y, chart.width, 1.0), 
+            [color.rgb(0.0, 0.0, 0.0)])
+    for i in range(8) :
+        X = 1.0-(i+1.0)/9.0
+        canv.fill(waning_moon(X, 0.08, x+(i+4.0)/4.0, -1.3),
+                    [style.linejoin.bevel,mooncolorlight])
+    canv.text(x+1.8, -1.1,
+              r'{\footnotesize\sffamily Küçülen Ay}',
+              [text.halign.center,text.valign.baseline,mooncolorlight])
+    canv.text(x+1.8, -1.7,
+              r"{\scriptsize\sffamily (Ay'ın doğuş zamanları)}",
+              [text.halign.center,text.valign.baseline,mooncolorlight])
+    for i in range(8) :
+        X = (i+1.0)/9.0
+        canv.fill(waxing_moon(X, 0.08, x+(i+4.0)/4.0+3.0, -1.3),
+                    [style.linejoin.bevel,mooncolordark])
+    canv.text(x+1.8+3.0, -1.1,
+              r'{\footnotesize\sffamily Büyüyen Ay}',
+              [text.halign.center,text.valign.baseline,mooncolordark])
+    canv.text(x+1.8+3.0, -1.7,
+              r"{\scriptsize\sffamily (Ay'ın batış zamanları)}",
+              [text.halign.center,text.valign.baseline,mooncolordark])

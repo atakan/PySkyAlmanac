@@ -312,7 +312,7 @@ mercury.rising_text = [
 [0.89, 'Merkür', 'doğuyor', -1, False]
 ]
 venus.rising_text = [
-[0.76, 'Venüs doğuyor', '~', -1, True]
+[0.71, 'Venüs doğuyor', '~', -1, True]
 ]
 mars.rising_text = [
 [0.12, 'Mars doğuyor', '~', 0, False]
@@ -380,8 +380,8 @@ mercury.setting_text = [
 [0.8, 'Merkür', '~~batıyor', -1, False]
 ]
 venus.setting_text = [
-[0.31, 'batıyor', '~', 0, False],
-[0.34, 'Venüs ', '~', 0, False]
+[0.30, 'batıyor', '~', 0, False],
+[0.33, 'Venüs ', '~', 0, False]
 ]
 mars.setting_text = [
 [0.48, 'Mars batıyor', '~', 0, False]
@@ -467,10 +467,10 @@ for i, tlab in enumerate(['17', '18', '19', '20',
 x = chart.width*3.0/12.0
 y1 = -0.75
 y2 = chart.height+0.65
-c.text(x, y1, 'AKŞAM', [text.halign.center, text.valign.baseline])
+#c.text(x, y1, 'AKŞAM', [text.halign.center, text.valign.baseline])
 c.text(x, y2, 'AKŞAM', [text.halign.center, text.valign.baseline])
 x = chart.width*9.0/12.0
-c.text(x, y1, 'SABAH', [text.halign.center, text.valign.baseline])
+#c.text(x, y1, 'SABAH', [text.halign.center, text.valign.baseline])
 c.text(x, y2, 'SABAH', [text.halign.center, text.valign.baseline])
 
 ## background colouring around the chart to indicate DST
@@ -532,6 +532,8 @@ c.stroke(bot_line)
 
 c.stroke(event_to_path(sun_set, chart))
 c.stroke(event_to_path(sun_rise, chart))
+
+make_moon_key(c, chart)
 
 c.writePDFfile("almanac_%d_Ankara" % (year))
 
