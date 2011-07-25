@@ -7,7 +7,7 @@ The code is written in Python. It uses
 and [SciPy](http://www.scipy.org/) for a simple root-finding calculation.
 
 This is in development stage and certainly has bugs. In addition, the
-code is for Ankara and 2010. I tried to make it easy to adapt to
+code is for Ankara and 2012. I tried to make it easy to adapt to
 different locations and years; in particular, the comments and the
 function names are in English. If you plan to port it to a different
 locale (location, timeframe, language etc.) please let me know. I would
