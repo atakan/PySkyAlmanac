@@ -205,10 +205,10 @@ bclc = canvas.canvas([canvas.clip(clippath)]) # clipped canvas for the backgroun
 # a seperate (larger) clipping canvas for Moon phases
 clippath2 = event_to_path([rev_sun_set[0]+2.0] +
         rev_sun_set[:] + [rev_sun_set[-1]-2.0], chart, do_check=False,
-            xoffset=-1.3)
+            xoffset=-1.6)
 clippath2 = clippath2.joined(event_to_path([sun_rise[0]-2.0] +
             sun_rise[:] + [sun_rise[-1]+2.0], chart, do_check=False,
-            xoffset=1.3))
+            xoffset=1.6))
 clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
