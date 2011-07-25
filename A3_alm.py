@@ -24,6 +24,9 @@ from datetime import timedelta as TD
 from pyx import path, canvas, color, style, text, graph
 from scipy import optimize
 
+from almanac_bg import *
+from almanac_utils import to_chart_coord
+
 PI = atan(1)*4.0
 mnt_names = ['sıfırıncı', 'Ocak', 'Şubat', 'Mart',
           'Nisan', 'Mayıs', 'Haziran', 'Temmuz',
@@ -145,16 +148,6 @@ for doy in range(no_days+3) :
     for sb in setting_bodies :
         sb.update_setting(obs)
 
-def to_chart_coord(event_time, chart) :
-    diff =  event_time - chart.ULcorn
-    X = fmod(diff,1)
-    if X<0.0 : X+= 1.0
-    Y = floor(diff)
-    X *= chart.width / (chart.URcorn - chart.ULcorn) 
-    Y *= chart.height / (chart.ULcorn - chart.LLcorn)
-    Y += chart.height
-    return [X, Y]
-
 def event_to_path(event, chart) :
     '''accepts an array of points representing an event, converts this
        event to a path'''
@@ -220,132 +213,31 @@ rev_sun_set.reverse()
 clippath = event_to_path_no_check(rev_sun_set[:] + sun_rise[:], chart)
 clippath.append(path.closepath())
 
-clc = canvas.canvas([canvas.clip(clippath)])
+clc = canvas.canvas([canvas.clip(clippath)]) # clipped canvas for paths, text and moon
+bclc = canvas.canvas([canvas.clip(clippath)]) # clipped canvas for the background and the dots
 
 # a seperate (larger) clipping canvas for Moon phases
 clippath2 = event_to_path_no_check_with_offset([rev_sun_set[0]+2.0] +
         rev_sun_set[:] + [rev_sun_set[-1]-2.0], chart,
-            xoffset=-1.2)
+            xoffset=-1.3)
 clippath2 = clippath2.joined(event_to_path_no_check_with_offset([sun_rise[0]-2.0] +
-            sun_rise[:] + [sun_rise[-1]+2.0], chart, xoffset=1.2))
+            sun_rise[:] + [sun_rise[-1]+2.0], chart, xoffset=1.3))
 clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
-# make a gradient of dark blue to black in the bg
-daycolor = color.rgb(0,82/255.0,137/255.0)
-nightcolor = color.rgb(0,0,0)
-DNcolgrad = color.lineargradient(daycolor,nightcolor)
-# First try: Drawing thick lines, does not really work.
-#for i in range(41) :
-#    horangle = 18.0*i/40
-#    obs.horizon = '-%d' % (horangle)
-#    eve_twi_grad = []
-#    mor_twi_grad = []
-#    for doy in range(no_days) :
-#        obs.date = begin_day + doy
-#        eve_twi_grad.append(obs.next_setting(sun))
-#        mor_twi_grad.append(obs.next_rising(sun))
-#    eve_twi_gradp = event_to_path(eve_twi_grad, chart)
-#    mor_twi_gradp = event_to_path(mor_twi_grad, chart)
-#    clc.stroke(eve_twi_gradp,[style.linewidth(0.24),DNcolgrad.getcolor(i/40.0)])
-#    clc.stroke(mor_twi_gradp,[style.linewidth(0.24),DNcolgrad.getcolor(i/40.0)])
-
-## Second try: using rectangles for each day. Leads to a very big file
-## and artifacts on screen, especially with antialiasing, hopefully fine
-## when printed.
-#def draw_LR_colgrad_rect(canv, LLx, LLy, W, H, colgrad, n) :
-#    ''' Draw a rectangle consisting of n sub rectangles, each selecting its
-#        color from the given color gradient.'''
-#    for i in range(n) :
-#        llx = (i+0.0)/n * W + LLx
-#        lly = LLy
-#        # XXX multiplication by 1.02 below is to make sure that
-#        # XXX sub-rectangles overlap
-#        w = 1.0/n * W * 1.02
-#        h = H
-#        canv.fill(path.rect(llx, lly, w, h), [colgrad.getcolor((i+0.0)/n)])
-#
-#day_thickness = chart.height/no_days
-#for doy in range(no_days) :
-#    # XXX w/o the little addition of 0.2*ephem.hour below, we would have
-#    # XXX small empty triangular regions.
-#    SS = to_chart_coord(sun_set[doy]-0.2*ephem.hour, chart)
-#    ET = to_chart_coord(eve_twilight[doy], chart) 
-#    MT = to_chart_coord(mor_twilight[doy], chart) 
-#    SR = to_chart_coord(sun_rise[doy]+0.2*ephem.hour, chart)
-## evening twilight to darkness
-#    LLx = SS[0]
-#    LLy = SS[1] - day_thickness/2.0
-#    W = ET[0] - SS[0]
-#    H = day_thickness
-#    draw_LR_colgrad_rect(clc, LLx, LLy, W, H, DNcolgrad, 18)
-## darkness to morning twilight
-#    LLx = SR[0]
-#    W = MT[0] - SR[0] # XXX note: negative width
-#    draw_LR_colgrad_rect(clc, LLx, LLy, W, H, DNcolgrad, 18)
-
-
-
-## Darkness between twilights
-#rev_eve_twilight = eve_twilight[:]
-#rev_eve_twilight.reverse()
-#darknesspath = event_to_path_no_check(rev_eve_twilight[:] + mor_twilight[:], chart)
-#darknesspath.append(path.closepath())
-#clc.stroke(darknesspath, [nightcolor])
-#clc.fill(darknesspath, [nightcolor])
-
-# Third try: Per Alp Akoğlu's request let's try to this right.
-# This way it will also be more general and easier to adapt to higher
-# latitudes where twilight never ends on some days of the year.
-
-gdata = []
-for doy in range(0, no_days, 10) :
-    for tt in range(16*6+1) : # for 16 hours, every 10 minutes
-        sun_tt = chart.ULcorn + doy + tt*ephem.minute*10
-        x, y = to_chart_coord(sun_tt, chart)
-        obs.date = sun_tt
-        sun.compute(obs)
-        z = sun.alt/ephem.degrees('-18:00:00')
-        if z>1 : z=1
-        if z<0 : z=0
-        z = z*z # this makes the twilight more prominent
-        gdata.append([x, y, z])
-
-# XXX I found the magic numbers below by trial error
-g = graph.graphxyz(size=1, xpos=11, ypos=16.73, xscale=12, yscale=18.31,
-        projector=graph.graphxyz.parallel(-90, 90),
-        x=graph.axis.linear(min=-1, max=chart.width+1, painter=None),
-        y=graph.axis.linear(min=-1, max=chart.height+1, painter=None),
-        z=graph.axis.linear(min=-1, max=2, painter=None))
-g.plot(graph.data.points(gdata, x=1, y=2, z=3, color=3),
-       [graph.style.surface(gradient=DNcolgrad,
-                            gridcolor=None,
-                            backcolor=color.rgb.black)])
-clc.insert(g)
-# the following is for the debugging the graph above
-#c.stroke(path.line(0, 0, chart.width, chart.height), [color.cmyk.Red])
-
-# vertical dots
-# left side is 4pm, right side is 8am. We will draw dots every 1/2 hour
-nlines = int(round((chart.URcorn-chart.ULcorn)/ephem.hour*2+1))
-xincr = chart.width/(nlines-1)
-h = chart.height
-for i in range(nlines) :
-    clc.stroke(path.line(i*xincr, 0, i*xincr, h),
-            [color.cmyk.Gray, style.linestyle(style.linecap.round,
-                style.dash([0, 2.6333*366.0/no_days]))])
-
-# horizontal dots
-# we start with the first Sunday of the year
-for first_sun in range(1,8) :
-    if calendar.weekday(year, 1, first_sun) == calendar.SUNDAY :
+for first_sunday in range(1,8) :
+    if calendar.weekday(year, 1, first_sunday) == calendar.SUNDAY :
         break
-for sunday in range(first_sun, no_days, 7) :
+make_alm_bg(bclc, begin_day_datetime, no_days, chart, obs,
+        sun, sun_set, sun_rise) 
+make_alm_bg_vdots(bclc, first_sunday, no_days, chart) 
+make_alm_bg_hdots(bclc, first_sunday, no_days, chart) 
+
+# Days of the month, printed on Sunday evenings and Monday mornings
+for sunday in range(first_sunday, no_days, 7) :
     x1 = 0
     x2 = chart.width
     y = chart.height - (sunday * chart.height / no_days)
-    clc.stroke(path.line(x1, y, x2, y),
-            [color.cmyk.Gray, style.linestyle(style.linecap.round, style.dash([0, 3.248]))])
     mor_date = begin_day_datetime + TD(days=sunday, hours=4)
     mor_x, mor_y = to_chart_coord(sun_set[sunday], chart)
     eve_date = begin_day_datetime + TD(days=sunday, hours=16)
@@ -354,7 +246,6 @@ for sunday in range(first_sun, no_days, 7) :
             [text.halign.right, text.valign.middle])
     c.text(eve_x+0.2, y, '%s' % (eve_date.day),
             [text.halign.left, text.valign.middle])
-
 # Twilight lines
 clc.stroke(event_to_path(eve_twilight, chart),
            [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
@@ -426,97 +317,6 @@ def add_text_to_path(canv, chart, ev, pos,
                txt_color])
 #    canv.stroke(path.line(x,y,x+2.0*cos(slope),y+2.0*sin(slope)))
 #    canv.stroke(path.line(x,y,x-2.0*sin(slope),y+2.0*cos(slope)))
-
-# Planets etc.
-mercury.rising_text = [
-[0.06, 'Merkür', 'doğuyor', -1, True],
-[0.34, 'Merkür', 'doğuyor', -1, False],
-[0.595, 'Merkür', 'doğuyor', -1, False],
-[0.89, 'Merkür', 'doğuyor', -1, False]
-]
-venus.rising_text = [
-[0.76, 'Venüs doğuyor', '~', -1, True]
-]
-mars.rising_text = [
-[0.12, 'Mars doğuyor', '~', 0, False]
-]
-jupiter.rising_text = [
-[0.62, 'Jüpiter doğuyor', '~', 0, False]
-]
-saturn.rising_text = [
-[0.15, 'Satürn doğuyor', '~', 0, False],
-[0.94, 'Satürn doğuyor', '~', 0, False]
-]
-uranus.rising_text = [
-[0.45, 'Uranüs', 'doğuyor', -1, False]
-]
-neptune.rising_text = [
-[0.4, 'Neptün doğuyor', '~', 0, False]
-]
-for rb in rising_bodies :
-    clc.stroke(event_to_path(rb.rising, chart), [rb.color])
-    for rstxt in rb.rising_text :
-        add_text_to_path(clc, chart, rb.rising, rstxt[0],
-                txt1=rstxt[1], txt2=rstxt[2], offset=rstxt[3],
-                rotate=rstxt[4], txt_color=rb.color)
-mars.transit_text = [
-[0.1, 'Mars meridyende', '~', 0, False]
-]
-jupiter.transit_text = [
-[0.06, 'Jüpiter', 'meridyende', -1, False],
-[0.87, 'Jüpiter meridyende', '~', 0, False]
-]
-saturn.transit_text = [
-[0.25, 'Satürn meridyende', '~', 0, False]
-]
-uranus.transit_text = [
-[0.014, 'Ur.', 'mrd.', -1, False],
-[0.75, '~', 'Uranüs meridyende', -1, False]
-]
-neptune.transit_text = [
-[0.67, '~', 'Neptün meridyende', -1, False]
-]
-for tb in transit_bodies :
-    clc.stroke(event_to_path(tb.transit, chart), [tb.color])
-    for tstxt in tb.transit_text :
-        add_text_to_path(clc, chart, tb.transit, tstxt[0],
-                txt1=tstxt[1], txt2=tstxt[2], offset=tstxt[3],
-                rotate=tstxt[4], txt_color=tb.color)
-mercury.setting_text = [
-[0.16, 'Merkür', 'batıyor', -1, True],
-[0.52, 'Merkür', 'batıyor', -1, False],
-[0.8, 'Merkür', '~~batıyor', -1, False]
-]
-venus.setting_text = [
-[0.31, 'batıyor', '~', 0, False],
-[0.34, 'Venüs ', '~', 0, False]
-]
-mars.setting_text = [
-[0.48, 'Mars batıyor', '~', 0, False]
-]
-jupiter.setting_text = [
-[0.25, 'Jüpiter batıyor', '~', 0, False],
-[0.94, 'Jüpiter batıyor', '~', 0, False]
-]
-saturn.setting_text = [
-[0.4, 'Satürn batıyor', '~', 0, False]
-]
-uranus.setting_text = [
-[0.08, '~', 'Uranüs batıyor', -1, False],
-[0.94, 'Uranüs batıyor', '~', 0, False]
-]
-neptune.setting_text = [
-[0.07, 'Neptün batıyor', '~', 0, False],
-[0.94, 'Neptün batıyor', '~', 0, False]
-]
-for sb in setting_bodies :
-    clc.stroke(event_to_path(sb.setting, chart), [sb.color])
-    for sttxt in sb.setting_text :
-        add_text_to_path(clc, chart, sb.setting, sttxt[0],
-                txt1=sttxt[1], txt2=sttxt[2], offset=sttxt[3],
-                rotate=sttxt[4], txt_color=sb.color)
-
-c.insert(clc)
 
 # Moon
 moon = ephem.Moon()
@@ -597,7 +397,7 @@ for doy in range(no_days) :
         # new moon
         mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
     else :
-        mclc.fill(waxing_moon(X, 0.08, x, y),
+        clc.fill(waxing_moon(X, 0.08, x, y),
                 [style.linejoin.bevel,mooncolordark])
     # Waning moon (moonrises)
     moon_rise = obs.next_rising(moon)
@@ -618,9 +418,101 @@ for doy in range(no_days) :
         # new moon
         mclc.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
     else :
-        mclc.fill(waning_moon(X, 0.08, x, y),
+        clc.fill(waning_moon(X, 0.08, x, y),
                 [style.linejoin.bevel,mooncolorlight])
 
+# Planets etc.
+mercury.rising_text = [
+[0.06, 'Merkür', 'doğuyor', -1, True],
+[0.34, 'Merkür', 'doğuyor', -1, False],
+[0.595, 'Merkür', 'doğuyor', -1, False],
+[0.89, 'Merkür', 'doğuyor', -1, False]
+]
+venus.rising_text = [
+[0.76, 'Venüs doğuyor', '~', -1, True]
+]
+mars.rising_text = [
+[0.12, 'Mars doğuyor', '~', 0, False]
+]
+jupiter.rising_text = [
+[0.62, 'Jüpiter doğuyor', '~', 0, False]
+]
+saturn.rising_text = [
+[0.15, 'Satürn doğuyor', '~', 0, False],
+[0.94, 'Satürn doğuyor', '~', 0, False]
+]
+uranus.rising_text = [
+[0.45, 'Uranüs', 'doğuyor', -1, False]
+]
+neptune.rising_text = [
+[0.4, 'Neptün doğuyor', '~', 0, False]
+]
+for rb in rising_bodies :
+    clc.stroke(event_to_path(rb.rising, chart), [rb.color])
+    for rstxt in rb.rising_text :
+        add_text_to_path(clc, chart, rb.rising, rstxt[0],
+                txt1=rstxt[1], txt2=rstxt[2], offset=rstxt[3],
+                rotate=rstxt[4], txt_color=rb.color)
+mars.transit_text = [
+[0.1, 'Mars meridyende', '~', 0, False]
+]
+jupiter.transit_text = [
+[0.06, 'Jüpiter', 'meridyende', -1, False],
+[0.87, 'Jüpiter meridyende', '~', 0, False]
+]
+saturn.transit_text = [
+[0.25, 'Satürn meridyende', '~', 0, False]
+]
+uranus.transit_text = [
+[0.014, 'Ur.', 'mrd.', -1, False],
+[0.75, 'Uranüs meridyende', '~', 0, False]
+]
+neptune.transit_text = [
+[0.67, '~', 'Neptün meridyende', -1, False]
+]
+for tb in transit_bodies :
+    clc.stroke(event_to_path(tb.transit, chart), [tb.color])
+    for tstxt in tb.transit_text :
+        add_text_to_path(clc, chart, tb.transit, tstxt[0],
+                txt1=tstxt[1], txt2=tstxt[2], offset=tstxt[3],
+                rotate=tstxt[4], txt_color=tb.color)
+mercury.setting_text = [
+[0.16, 'Merkür', 'batıyor', -1, True],
+[0.52, 'Merkür', 'batıyor', -1, False],
+[0.8, 'Merkür', '~~batıyor', -1, False]
+]
+venus.setting_text = [
+[0.31, 'batıyor', '~', 0, False],
+[0.34, 'Venüs ', '~', 0, False]
+]
+mars.setting_text = [
+[0.48, 'Mars batıyor', '~', 0, False]
+]
+jupiter.setting_text = [
+[0.25, 'Jüpiter batıyor', '~', 0, False],
+[0.94, 'Jüpiter batıyor', '~', 0, False]
+]
+saturn.setting_text = [
+[0.4, 'Satürn batıyor', '~', 0, False]
+]
+uranus.setting_text = [
+[0.08, '~', 'Uranüs batıyor', -1, False],
+[0.94, 'Uranüs batıyor', '~', 0, False]
+]
+neptune.setting_text = [
+[0.07, 'Neptün batıyor', '~', 0, False],
+[0.94, 'Neptün batıyor', '~', 0, False]
+]
+for sb in setting_bodies :
+    clc.stroke(event_to_path(sb.setting, chart), [sb.color])
+    for sttxt in sb.setting_text :
+        add_text_to_path(clc, chart, sb.setting, sttxt[0],
+                txt1=sttxt[1], txt2=sttxt[2], offset=sttxt[3],
+                rotate=sttxt[4], txt_color=sb.color)
+
+
+c.insert(bclc)
+c.insert(clc)
 c.insert(mclc)
 
 # hour labels (from 5pm to 7am)
