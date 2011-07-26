@@ -535,5 +535,12 @@ c.stroke(event_to_path(sun_rise, chart))
 
 make_moon_key(c, chart)
 
+c.text(0.0, chart.height/2.0,
+       r'{\tiny{\sffamily PySkyAlmanac:} {\ttfamily https://github.com/atakan/PySkyAlmanac}}',
+       [
+        text.halign.center,text.valign.bottom,
+        pyx.trafo.rotate(90),
+        color.cmyk.Black])
+
 c.writePDFfile("almanac_%d_Ankara" % (year))
 
