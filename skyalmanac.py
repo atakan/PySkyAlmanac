@@ -152,23 +152,23 @@ betelgeuse = PyEph_body(ephem.star('Betelgeuse'))
 pollux     = PyEph_body(ephem.star('Pollux'))
 
 rising_bodies  = [mercury, venus, mars, jupiter, uranus, neptune,
-                  m13, m31, m42, m45,
+                  m31, m42, m45,
                   sirius, antares, deneb, betelgeuse, pollux]
 setting_bodies = [mercury, venus, mars, jupiter, uranus, neptune,
-                  m13, m31, m42, m45,
+                  m31, m42, m45,
                   sirius, antares, deneb, betelgeuse, pollux]
 transit_bodies = [mars, jupiter, uranus, neptune,
-                  m13, m31, m42, m45,
+                  m31, m42, m45,
                   sirius, antares, deneb, betelgeuse, pollux]
 
 rising_bodies  = [antares, 
-                  m42, m45,
+                  m31, m42, m45,
                   mercury, venus, mars, jupiter, saturn, uranus, neptune]
 setting_bodies = [antares,
-                  m45,
+                  m31, m42, m45,
                   mercury, venus, mars, jupiter, saturn, uranus, neptune]
 transit_bodies = [antares,
-                  m42, m45,
+                  m31, m42, m45,
                   mars, jupiter, saturn, uranus, neptune]
 
 # XXX the +5, -5 bug fix below is a mystery to me,
@@ -221,8 +221,8 @@ clippath2 = clippath2.joined(event_to_path([sun_rise[0]-2.0] +
 clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
-make_alm_bg(bclc, begin_day_datetime, no_days, chart,
-        obs, sun, sun_set, sun_rise) 
+#make_alm_bg(bclc, begin_day_datetime, no_days, chart,
+#        obs, sun, sun_set, sun_rise) 
 make_alm_bg_vdots(bclc, first_sunday, no_days, chart) 
 make_alm_bg_hdots(bclc, first_sunday, no_days, chart) 
 
@@ -312,7 +312,7 @@ mercury.rising_text = [
 [0.06, 'Merkür', 'doğuyor', -1, True],
 [0.34, 'Merkür', 'doğuyor', -1, False],
 [0.595, 'Merkür', 'doğuyor', -1, False],
-[0.89, 'Merkür', 'doğuyor', -1, False]
+[0.885, 'Merkür', 'doğuyor', -1, False]
 ]
 venus.rising_text = [
 [0.71, 'Venüs doğuyor', '~', -1, True]
@@ -332,6 +332,9 @@ uranus.rising_text = [
 ]
 neptune.rising_text = [
 [0.4, '~', 'Neptün doğuyor', -1, False]
+]
+m31.rising_text = [
+[0.24, 'M31 doğuyor', '~', 0, False]
 ]
 m45.rising_text = [
 [0.57, 'M45 doğuyor', '~', 0, False]
@@ -366,6 +369,10 @@ uranus.transit_text = [
 neptune.transit_text = [
 [0.67, '~', 'Neptün meridyende', -1, False]
 ]
+m31.transit_text = [
+[0.03, '~', 'M31 meridyende', -1, False],
+[0.65, '~', 'M31 meridyende', -1, False]
+]
 m45.transit_text = [
 [0.08, '~', 'M45 meridyende', -1, False],
 [0.83, '~', 'M45 meridyende', -1, False]
@@ -376,7 +383,7 @@ m42.transit_text = [
 ]
 antares.transit_text = [
 [0.18, 'Antares meridyende', '~', 0, False],
-[0.96, 'Antares', 'meridyende', -1, False]
+[0.963, 'Antares mrd.', '~', 0, False]
 ]
 for tb in transit_bodies :
     for tstxt in tb.transit_text :
@@ -398,7 +405,7 @@ mars.setting_text = [
 ]
 jupiter.setting_text = [
 [0.25, 'Jüpiter batıyor', '~', 0, False],
-[0.94, 'Jüpiter batıyor', '~', 0, False]
+[0.934, '~', 'Jüpiter batıyor', -1, False]
 ]
 saturn.setting_text = [
 [0.4, 'Satürn batıyor', '~', 0, False]
@@ -411,9 +418,17 @@ neptune.setting_text = [
 [0.05, '~', 'Neptün batıyor', -1, False],
 [0.94, 'Neptün batıyor', '~', 0, False]
 ]
+m31.setting_text = [
+[0.15, '~', 'M31 batıyor', -1, False],
+[0.94, '~', 'M31 batıyor', -1, False]
+]
 m45.setting_text = [
-[0.35, 'M45 batıyor', '~', 0, False],
-[0.97, 'M45 batıyor', '~', 0, False]
+[0.35, '~', 'M45 batıyor', -1, False],
+[0.965, '~', 'M45 batıyor', -1, False]
+]
+m42.setting_text = [
+[0.35, 'M42 batıyor', '~', 0, False],
+[0.97, 'M42 batıyor', '~', 0, False]
 ]
 antares.setting_text = [
 [0.45, 'Antares batıyor', '~', 0, False]
@@ -457,6 +472,8 @@ def body_path_calibrator(canv, bd) :
         add_text_to_path(canv, chart, bd.setting, x,
                 txt1='S',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
 
+#body_path_calibrator(c, m13)
+#body_path_calibrator(c, m31)
 #body_path_calibrator(c, m42)
 
 # hour labels (from 5pm to 7am)
