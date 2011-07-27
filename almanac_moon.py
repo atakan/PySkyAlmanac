@@ -155,3 +155,17 @@ def make_moon_key(canv, chart) :
     canv.text(x+1.8+3.0, -1.7,
               r"{\scriptsize\sffamily (Ay'ın batış zamanları)}",
               [text.halign.center,text.valign.baseline,mooncolordark])
+    # new moon, first quarter
+    # full moon,  last quarter
+    canv.stroke(path.circle(x+9.0,-1.1,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
+    canv.text(x+8.75, -1.2, r'{\footnotesize\sffamily Yeni ay}',
+            [text.halign.right,text.valign.baseline, mooncolordark])
+    canv.stroke(first_quarter_moon(0.12, x+9.4,-1.1),[mooncolordark,pyx.deco.filled([mooncolordark])])
+    canv.text(x+9.75, -1.2, r'{\footnotesize\sffamily İlk dördün}',
+            [text.halign.left,text.valign.baseline, mooncolordark])
+    canv.stroke(path.circle(x+9.0,-1.5,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+    canv.text(x+8.75, -1.6, r'{\footnotesize\sffamily Dolunay}',
+            [text.halign.right,text.valign.baseline, mooncolorlight])
+    canv.stroke(last_quarter_moon(0.12, x+9.4,-1.5),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+    canv.text(x+9.75, -1.6, r'{\footnotesize\sffamily Son dördün}',
+            [text.halign.left,text.valign.baseline, mooncolorlight])
