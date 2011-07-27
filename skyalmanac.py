@@ -145,11 +145,11 @@ m42 = PyEph_body(ephem.readdb("M42,f|U,05:35:18,-05:23,4,2000,3960"),
 m45 = PyEph_body(ephem.readdb("M45,f|U,03:47:0,24:07,1.2,2000,6000"),
         symbol='m45', tsize='tiny')
 # some bright stars
-sirius     = PyEph_body(ephem.star('Sirius'))
+sirius     = PyEph_body(ephem.star('Sirius'), symbol='Sir', tsize='tiny')
 antares    = PyEph_body(ephem.star('Regulus'), symbol='Ant', tsize='tiny')
-deneb      = PyEph_body(ephem.star('Deneb'))
-betelgeuse = PyEph_body(ephem.star('Betelgeuse'))
-pollux     = PyEph_body(ephem.star('Pollux'))
+deneb      = PyEph_body(ephem.star('Deneb'), symbol='Den', tsize='tiny')
+betelgeuse = PyEph_body(ephem.star('Betelgeuse'), symbol='Bet', tsize='tiny')
+pollux     = PyEph_body(ephem.star('Pollux'), symbol='Pol', tsize='tiny')
 
 rising_bodies  = [mercury, venus, mars, jupiter, uranus, neptune,
                   m31, m42, m45,
@@ -161,21 +161,25 @@ transit_bodies = [mars, jupiter, uranus, neptune,
                   m31, m42, m45,
                   sirius, antares, deneb, betelgeuse, pollux]
 
-rising_bodies  = [antares, 
+rising_bodies  = [mars]
+setting_bodies = [mars]
+transit_bodies = [mars]
+
+rising_bodies  = [ 
                   m31, m42, m45,
                   mercury, venus, mars, jupiter, saturn, uranus, neptune]
-setting_bodies = [antares,
+setting_bodies = [
                   m31, m42, m45,
                   mercury, venus, mars, jupiter, saturn, uranus, neptune]
-transit_bodies = [antares,
+transit_bodies = [antares, deneb, betelgeuse, pollux,
                   m31, m42, m45,
                   mars, jupiter, saturn, uranus, neptune]
 
-# XXX the +5, -5 bug fix below is a mystery to me,
+# XXX the +8, -8 bug fix below is a mystery to me,
 # XXX but it seems necessary. this probably points out to a deeper
 # XXX problem.
-for doy in range(no_days+5) :
-    obs.date = begin_day + doy -5
+for doy in range(no_days+8) :
+    obs.date = begin_day + doy -8
     for rb in rising_bodies :
         rb.update_rising(obs)
     for tb in transit_bodies :
@@ -221,8 +225,8 @@ clippath2 = clippath2.joined(event_to_path([sun_rise[0]-2.0] +
 clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
-#make_alm_bg(bclc, begin_day_datetime, no_days, chart,
-#        obs, sun, sun_set, sun_rise) 
+make_alm_bg(bclc, begin_day_datetime, no_days, chart,
+        obs, sun, sun_set, sun_rise) 
 make_alm_bg_vdots(bclc, first_sunday, no_days, chart) 
 make_alm_bg_hdots(bclc, first_sunday, no_days, chart) 
 
@@ -363,27 +367,38 @@ saturn.transit_text = [
 [0.25, 'Satürn meridyende', '~', 0, False]
 ]
 uranus.transit_text = [
-[0.014, 'Ur.', 'mrd.', -1, False],
+[0.018, 'Ur.', 'mrd.', -1, False],
 [0.75, 'Uranüs meridyende', '~', 0, False]
 ]
 neptune.transit_text = [
 [0.67, '~', 'Neptün meridyende', -1, False]
 ]
 m31.transit_text = [
-[0.03, '~', 'M31 meridyende', -1, False],
-[0.65, '~', 'M31 meridyende', -1, False]
+[0.035, '~', 'M31 meridyende', -1, False],
+[0.77, '~', 'M31 meridyende', -1, False]
 ]
 m45.transit_text = [
 [0.08, '~', 'M45 meridyende', -1, False],
 [0.83, '~', 'M45 meridyende', -1, False]
 ]
 m42.transit_text = [
-[0.12, '~', 'M42 meridyende', -1, False],
+[0.13, 'M42 meridyende', '~', 0, False],
 [0.87, 'M42 meridyende', '~', 0, False]
 ]
 antares.transit_text = [
 [0.18, 'Antares meridyende', '~', 0, False],
 [0.963, 'Antares mrd.', '~', 0, False]
+]
+betelgeuse.transit_text = [
+[0.14, 'Betelgeuse', 'meridyende', -1, False],
+[0.87, '~', 'Betelgeuse meridyende', -1, False]
+]
+pollux.transit_text = [
+[0.2, 'Pollux', 'meridyende', -1, False],
+[0.94, 'Pollux meridyende', '~', 0, False]
+]
+deneb.transit_text = [
+[0.68, 'Deneb meridyende', '~', 0, False],
 ]
 for tb in transit_bodies :
     for tstxt in tb.transit_text :
@@ -392,7 +407,7 @@ for tb in transit_bodies :
                 rotate=tstxt[4], txt_color=tb.color, txt_size=tb.tsize)
 
 mercury.setting_text = [
-[0.16, 'Merkür', 'batıyor', -1, True],
+[0.15, 'Merkür', 'batıyor', -1, True],
 [0.52, 'Merkür', 'batıyor', -1, False],
 [0.8, 'Merkür', '~~batıyor', -1, False]
 ]
@@ -412,11 +427,11 @@ saturn.setting_text = [
 ]
 uranus.setting_text = [
 [0.08, '~', 'Uranüs batıyor', -1, False],
-[0.94, 'Uranüs batıyor', '~', 0, False]
+[0.92, '~', 'Uranüs batıyor', -1, False]
 ]
 neptune.setting_text = [
-[0.05, '~', 'Neptün batıyor', -1, False],
-[0.94, 'Neptün batıyor', '~', 0, False]
+[0.06, 'Neptün batıyor', '~', 0, False],
+[0.88, 'Neptün batıyor', '~', 0, False]
 ]
 m31.setting_text = [
 [0.15, '~', 'M31 batıyor', -1, False],
@@ -424,11 +439,11 @@ m31.setting_text = [
 ]
 m45.setting_text = [
 [0.35, '~', 'M45 batıyor', -1, False],
-[0.965, '~', 'M45 batıyor', -1, False]
+[0.960, '~', 'M45 batıyor', -1, False]
 ]
 m42.setting_text = [
 [0.35, 'M42 batıyor', '~', 0, False],
-[0.97, 'M42 batıyor', '~', 0, False]
+[0.965, 'M42 batıyor', '~', 0, False]
 ]
 antares.setting_text = [
 [0.45, 'Antares batıyor', '~', 0, False]
@@ -444,15 +459,15 @@ c.insert(mclc)
 c.insert(clc)
 
 def body_path_calibrator(canv, bd) :
-    # rising
-    canv.stroke(event_to_path(bd.rising, chart), [bd.color])
-    for x in [i/10.0 for i in range(1,10)] :
-        add_text_to_path(canv, chart, bd.rising, x,
-                txt1=bd.symbol,txt2=('%g'%(x)),txt_color=bd.color,
-                txt_size=bd.tsize)
-    for x in [i/10.0+0.05 for i in range(0,10)] :
-        add_text_to_path(canv, chart, bd.rising, x,
-                txt1='R',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
+#    # rising
+#    canv.stroke(event_to_path(bd.rising, chart), [bd.color])
+#    for x in [i/10.0 for i in range(1,10)] :
+#        add_text_to_path(canv, chart, bd.rising, x,
+#                txt1=bd.symbol,txt2=('%g'%(x)),txt_color=bd.color,
+#                txt_size=bd.tsize)
+#    for x in [i/10.0+0.05 for i in range(0,10)] :
+#        add_text_to_path(canv, chart, bd.rising, x,
+#                txt1='R',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
     # transit
     canv.stroke(event_to_path(bd.transit, chart), [bd.color])
     for x in [i/10.0 for i in range(1,10)] :
@@ -463,18 +478,22 @@ def body_path_calibrator(canv, bd) :
         add_text_to_path(canv, chart, bd.transit, x,
                 txt1='T',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
     # setting
-    canv.stroke(event_to_path(bd.setting, chart), [bd.color])
-    for x in [i/10.0 for i in range(1,10)] :
-        add_text_to_path(canv, chart, bd.setting, x,
-                txt1=bd.symbol,txt2=('%g'%(x)),txt_color=bd.color,
-                txt_size=bd.tsize)
-    for x in [i/10.0+0.05 for i in range(0,10)] :
-        add_text_to_path(canv, chart, bd.setting, x,
-                txt1='S',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
+#    canv.stroke(event_to_path(bd.setting, chart), [bd.color])
+#    for x in [i/10.0 for i in range(1,10)] :
+#        add_text_to_path(canv, chart, bd.setting, x,
+#                txt1=bd.symbol,txt2=('%g'%(x)),txt_color=bd.color,
+#                txt_size=bd.tsize)
+#    for x in [i/10.0+0.05 for i in range(0,10)] :
+#        add_text_to_path(canv, chart, bd.setting, x,
+#                txt1='S',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
 
 #body_path_calibrator(c, m13)
 #body_path_calibrator(c, m31)
 #body_path_calibrator(c, m42)
+
+#body_path_calibrator(c, deneb)
+#body_path_calibrator(c, betelgeuse)
+#body_path_calibrator(c, pollux)
 
 # hour labels (from 5pm to 7am)
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
@@ -561,6 +580,15 @@ c.stroke(event_to_path(sun_set, chart))
 c.stroke(event_to_path(sun_rise, chart))
 
 make_moon_key(c, chart)
+c.text(12., -1.1,
+              r'{\footnotesize\sffamily M31: Andromeda Gökadası}',
+              [text.halign.left,text.valign.baseline,color.cmyk.Gray])
+c.text(12., -1.4,
+              r'{\footnotesize\sffamily M42: Avcı Bulutsusu}',
+              [text.halign.left,text.valign.baseline,color.cmyk.Gray])
+c.text(12., -1.7,
+              r'{\footnotesize\sffamily M45: Yedi Kızkardeşler}',
+              [text.halign.left,text.valign.baseline,color.cmyk.Gray])
 
 c.text(0.0, chart.height/2.0,
        r'{\tiny{\sffamily PySkyAlmanac:} {\ttfamily https://github.com/atakan/PySkyAlmanac}}',
