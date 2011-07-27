@@ -136,9 +136,12 @@ saturn =  PyEph_body(ephem.Saturn(), color.cmyk.Yellow)
 uranus =  PyEph_body(ephem.Uranus(), color.cmyk.SpringGreen)
 neptune = PyEph_body(ephem.Neptune(), color.cmyk.ForestGreen)
 # some messier objects
-m13 = PyEph_body(ephem.readdb("M13,f|C,16:41:42,36:28,5.9,2000,996"))
-m31 = PyEph_body(ephem.readdb("M31,f|G,0:42:44,+41:16:8,4.16,2000,11433|3700|35"))
-m42 = PyEph_body(ephem.readdb("M42,f|U,05:35:18,-05:23,4,2000,3960"))
+m13 = PyEph_body(ephem.readdb("M13,f|C,16:41:42,36:28,5.9,2000,996"),
+        symbol='m13', tsize='tiny')
+m31 = PyEph_body(ephem.readdb("M31,f|G,0:42:44,+41:16:8,4.16,2000,11433|3700|35"),
+        symbol='m31', tsize='tiny')
+m42 = PyEph_body(ephem.readdb("M42,f|U,05:35:18,-05:23,4,2000,3960"),
+        symbol='m42', tsize='tiny')
 m45 = PyEph_body(ephem.readdb("M45,f|U,03:47:0,24:07,1.2,2000,6000"),
         symbol='m45', tsize='tiny')
 # some bright stars
@@ -158,21 +161,21 @@ transit_bodies = [mars, jupiter, uranus, neptune,
                   m13, m31, m42, m45,
                   sirius, antares, deneb, betelgeuse, pollux]
 
-rising_bodies  = [antares,
-                  m45,
+rising_bodies  = [antares, 
+                  m42, m45,
                   mercury, venus, mars, jupiter, saturn, uranus, neptune]
 setting_bodies = [antares,
                   m45,
                   mercury, venus, mars, jupiter, saturn, uranus, neptune]
 transit_bodies = [antares,
-                  m45,
+                  m42, m45,
                   mars, jupiter, saturn, uranus, neptune]
 
-# XXX the +3, -3 bug fix below is a mystery to me,
+# XXX the +5, -5 bug fix below is a mystery to me,
 # XXX but it seems necessary. this probably points out to a deeper
 # XXX problem.
-for doy in range(no_days+3) :
-    obs.date = begin_day + doy -3
+for doy in range(no_days+5) :
+    obs.date = begin_day + doy -5
     for rb in rising_bodies :
         rb.update_rising(obs)
     for tb in transit_bodies :
@@ -333,6 +336,9 @@ neptune.rising_text = [
 m45.rising_text = [
 [0.57, 'M45 doğuyor', '~', 0, False]
 ]
+m42.rising_text = [
+[0.73, 'M42 doğuyor', '~', 0, False]
+]
 antares.rising_text = [
 [0.1, 'Antares doğuyor', '~', 0, False],
 [0.87, 'Antares doğuyor', '~', 0, False]
@@ -363,6 +369,10 @@ neptune.transit_text = [
 m45.transit_text = [
 [0.08, '~', 'M45 meridyende', -1, False],
 [0.83, '~', 'M45 meridyende', -1, False]
+]
+m42.transit_text = [
+[0.12, '~', 'M42 meridyende', -1, False],
+[0.87, 'M42 meridyende', '~', 0, False]
 ]
 antares.transit_text = [
 [0.18, 'Antares meridyende', '~', 0, False],
@@ -447,7 +457,7 @@ def body_path_calibrator(canv, bd) :
         add_text_to_path(canv, chart, bd.setting, x,
                 txt1='S',txt2=('%g'%(x)),txt_color=bd.color, txt_size=bd.tsize)
 
-# body_path_calibrator(c, antares)
+#body_path_calibrator(c, m42)
 
 # hour labels (from 5pm to 7am)
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
