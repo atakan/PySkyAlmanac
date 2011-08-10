@@ -26,55 +26,16 @@ from pyx import path, canvas, color, style, text, graph
 from almanac_bg import *
 from almanac_moon import *
 from almanac_utils import *
+from local_info_Ankara_2011 import obs, obsTZ, utcTZ, year
+from local_info_Ankara_2011 import begin_day, begin_day_datetime, no_days
+from local_info_Ankara_2011 import first_sunday, first_sunday_datetime
+from local_info_Ankara_2011 import rising_bodies, transit_bodies, setting_bodies
 
 mnt_names = ['sıfırıncı', 'Ocak', 'Şubat', 'Mart',
           'Nisan', 'Mayıs', 'Haziran', 'Temmuz',
           'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
 mnt_shortnames = ['SFR', 'OCA', 'ŞUB', 'MAR', 'NİS', 'MAY',
                'HAZ', 'TEM', 'AĞU', 'EYL', 'EKİ', 'KAS', 'ARA']
-
-# Local stuff: Here we set the observer's location, timezone and DST
-# conventions.
-# In addition we set the year for the chart, the limits for the chart,
-# and make arrangements for the twilight lines.
-
-obs = ephem.Observer()
-# bodrum
-#obs.lat  = '37.04'
-#obs.long = '27.43'
-# ankara
-obs.lat  = '39.877'
-obs.long = '32.807'
-#obsTZ = pytz.timezone('Europe/Istanbul')
-obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal time, +3 summer time
-utcTZ = pytz.timezone('UTC')
-
-year = 2011
-begin_day_datetime = datetime.datetime(year-1, 12, 31, 12, tzinfo=obsTZ) # noon of the last day of previous year
-begin_day = ephem.Date(begin_day_datetime.astimezone(utcTZ)) # convert to UTC
-if calendar.isleap(year) :
-    no_days = 367
-else :
-    no_days = 366
-
-for first_sunday in range(1,8) :
-    if calendar.weekday(year, 1, first_sunday) == calendar.SUNDAY :
-        break
-first_sunday_datetime = datetime.datetime(year, 1, first_sunday, 12, tzinfo=obsTZ)
-
-## In Turkey (and in most of Europe), DST rules are:
-## Start: Last Sunday in March
-## End: Last Sunday in October
-## Time: 1.00 am (01:00) Greenwich Mean Time (GMT)
-## http://wwp.greenwichmeantime.com/time-zone/rules/eu/index.htm
-#for week in range(53) :
-#    sunday_datetime = first_sunday_datetime + TD(days=7*week)
-#    if (sunday_datetime.month == 3 and
-#        (sunday_datetime+TD(days=7)).month == 4) :
-#        dst_begin = ephem.Date(sunday_datetime.astimezone(utcTZ))
-#    if (sunday_datetime.month == 10 and
-#        (sunday_datetime+TD(days=7)).month == 11) :
-#        dst_end = ephem.Date(sunday_datetime.astimezone(utcTZ))
 
 class Chart() :
     pass
@@ -106,75 +67,6 @@ for doy in range(no_days) :
     obs.date = begin_day + doy
     sun_set.append(obs.next_setting(sun))
     sun_rise.append(obs.next_rising(sun))
-
-# Objects to be plotted on the chart
-class PyEph_body() :
-    def __init__(self, pyephem_name, clr=color.cmyk.Gray,
-            symbol='~', tsize='small') :
-        self.body = pyephem_name
-        self.color = clr
-        self.symbol = symbol
-        self.tsize = tsize
-        self.rising = []
-        self.rising_text = []
-        self.transit = []
-        self.transit_text = []
-        self.setting = []
-        self.setting_text = []
-    def update_rising(self, obs) :
-        self.rising.append(obs.next_rising(self.body))
-    def update_transit(self, obs) :
-        self.transit.append(obs.next_transit(self.body))
-    def update_setting(self, obs) :
-        self.setting.append(obs.next_setting(self.body))
-# planets
-mercury = PyEph_body(ephem.Mercury(), color.cmyk.BurntOrange)
-venus =   PyEph_body(ephem.Venus(), color.cmyk.CornflowerBlue)
-mars =    PyEph_body(ephem.Mars(), color.cmyk.Red)
-jupiter = PyEph_body(ephem.Jupiter(), color.cmyk.Magenta)
-saturn =  PyEph_body(ephem.Saturn(), color.cmyk.Yellow)
-uranus =  PyEph_body(ephem.Uranus(), color.cmyk.SpringGreen)
-neptune = PyEph_body(ephem.Neptune(), color.cmyk.ForestGreen)
-# some messier objects
-m13 = PyEph_body(ephem.readdb("M13,f|C,16:41:42,36:28,5.9,2000,996"),
-        symbol='m13', tsize='tiny')
-m31 = PyEph_body(ephem.readdb("M31,f|G,0:42:44,+41:16:8,4.16,2000,11433|3700|35"),
-        symbol='m31', tsize='tiny')
-m42 = PyEph_body(ephem.readdb("M42,f|U,05:35:18,-05:23,4,2000,3960"),
-        symbol='m42', tsize='tiny')
-m45 = PyEph_body(ephem.readdb("M45,f|U,03:47:0,24:07,1.2,2000,6000"),
-        symbol='m45', tsize='tiny')
-# some bright stars
-sirius     = PyEph_body(ephem.star('Sirius'), symbol='Sir', tsize='tiny')
-antares    = PyEph_body(ephem.star('Regulus'), symbol='Ant', tsize='tiny')
-deneb      = PyEph_body(ephem.star('Deneb'), symbol='Den', tsize='tiny')
-betelgeuse = PyEph_body(ephem.star('Betelgeuse'), symbol='Bet', tsize='tiny')
-pollux     = PyEph_body(ephem.star('Pollux'), symbol='Pol', tsize='tiny')
-arcturus   = PyEph_body(ephem.star('Arcturus'), symbol='Arc', tsize='tiny')
-
-rising_bodies  = [mercury, venus, mars, jupiter, uranus, neptune,
-                  m31, m42, m45,
-                  sirius, antares, deneb, betelgeuse, pollux]
-setting_bodies = [mercury, venus, mars, jupiter, uranus, neptune,
-                  m31, m42, m45,
-                  sirius, antares, deneb, betelgeuse, pollux]
-transit_bodies = [mars, jupiter, uranus, neptune,
-                  m31, m42, m45,
-                  sirius, antares, deneb, betelgeuse, pollux]
-
-rising_bodies  = [mars]
-setting_bodies = [mars]
-transit_bodies = [mars]
-
-rising_bodies  = [ 
-                  m31, m42, m45,
-                  mercury, venus, mars, jupiter, saturn, uranus, neptune]
-setting_bodies = [
-                  m31, m42, m45,
-                  mercury, venus, mars, jupiter, saturn, uranus, neptune]
-transit_bodies = [antares, deneb, arcturus, pollux,
-                  m31, m42, m45,
-                  mars, jupiter, saturn, uranus, neptune]
 
 # XXX the +8, -8 bug fix below is a mystery to me,
 # XXX but it seems necessary. this probably points out to a deeper
@@ -226,8 +118,8 @@ clippath2 = clippath2.joined(event_to_path([sun_rise[0]-2.0] +
 clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
-make_alm_bg(bclc, begin_day_datetime, no_days, chart,
-        obs, sun, sun_set, sun_rise) 
+#make_alm_bg(bclc, begin_day_datetime, no_days, chart,
+#        obs, sun, sun_set, sun_rise) 
 make_alm_bg_vdots(bclc, first_sunday, no_days, chart) 
 make_alm_bg_hdots(bclc, first_sunday, no_days, chart) 
 
@@ -303,7 +195,7 @@ def add_text_to_path(canv, chart, ev, pos,
 #    canv.stroke(path.line(x,y,x-2.0*sin(slope),y+2.0*cos(slope)))
 
 # Moon
-make_moon_stuff(mclc, clc, begin_day, no_days, chart, obs)
+#make_moon_stuff(mclc, clc, begin_day, no_days, chart, obs)
 
 # Planets etc.
 for rb in rising_bodies :
@@ -313,138 +205,18 @@ for sb in setting_bodies :
 for tb in transit_bodies :
     clc.stroke(event_to_path(tb.transit, chart), [tb.color])
 
-mercury.rising_text = [
-[0.1, 'Merkür', 'doğuyor', -1, True],
-[0.43, 'Merkür', 'doğuyor', -1, False],
-[0.72, 'Merkür', 'doğuyor', -1, True],
-[0.931, 'Merkür', 'doğuyor', -1, False]
-]
-venus.rising_text = [
-[0.1, 'Venüs doğuyor', '~', -1, True]
-]
-mars.rising_text = [
-[0.55, 'Mars doğuyor', '~', 0, False]
-]
-jupiter.rising_text = [
-[0.6, 'Jüpiter doğuyor', '~', 0, False]
-]
-saturn.rising_text = [
-[0.14, 'Satürn doğuyor', '~', 0, False],
-[0.83, 'Satürn doğuyor', '~', 0, False]
-]
-uranus.rising_text = [
-[0.6, 'Uranüs doğuyor', '~', -1, False]
-]
-neptune.rising_text = [
-[0.34, 'Neptün doğuyor', '~', 0, False]
-]
-m31.rising_text = [
-[0.24, 'M31 doğuyor', '~', 0, False]
-]
-m45.rising_text = [
-[0.57, 'M45 doğuyor', '~', 0, False]
-]
-m42.rising_text = [
-[0.73, 'M42 doğuyor', '~', 0, False]
-]
-antares.rising_text = [
-[0.1, 'Antares doğuyor', '~', 0, False],
-[0.87, 'Antares doğuyor', '~', 0, False]
-]
 for rb in rising_bodies :
     for rstxt in rb.rising_text :
         add_text_to_path(clc, chart, rb.rising, rstxt[0],
                 txt1=rstxt[1], txt2=rstxt[2], offset=rstxt[3],
                 rotate=rstxt[4], txt_color=rb.color, txt_size=rb.tsize)
 
-mars.transit_text = [
-[0.925, 'Mars meridyende', '~', 0, False]
-]
-jupiter.transit_text = [
-[0.7, 'Jüpiter meridyende', '~', 0, False]
-]
-saturn.transit_text = [
-[0.25, 'Satürn meridyende', '~', 0, False]
-]
-uranus.transit_text = [
-[0.75, '~', 'Uranüs meridyende', -1, False]
-]
-neptune.transit_text = [
-[0.67, 'Neptün meridyende', '~', 0, False]
-]
-m31.transit_text = [
-[0.035, '~', 'M31 meridyende', -1, False],
-[0.77, '~', 'M31 meridyende', -1, False]
-]
-m45.transit_text = [
-[0.08, '~', 'M45 meridyende', -1, False],
-[0.83, '~', 'M45 meridyende', -1, False]
-]
-m42.transit_text = [
-[0.13, 'M42 meridyende', '~', 0, False],
-[0.87, 'M42 meridyende', '~', 0, False]
-]
-antares.transit_text = [
-[0.18, 'Antares meridyende', '~', 0, False],
-[0.963, 'Antares mrd.', '~', 0, False]
-]
-arcturus.transit_text = [
-[0.2, 'Arcturus meridyende', '~', 0, False]
-]
-pollux.transit_text = [
-[0.2, 'Pollux', 'meridyende', -1, False],
-[0.94, 'Pollux meridyende', '~', 0, False]
-]
-deneb.transit_text = [
-[0.68, 'Deneb meridyende', '~', 0, False],
-]
 for tb in transit_bodies :
     for tstxt in tb.transit_text :
         add_text_to_path(clc, chart, tb.transit, tstxt[0],
                 txt1=tstxt[1], txt2=tstxt[2], offset=tstxt[3],
                 rotate=tstxt[4], txt_color=tb.color, txt_size=tb.tsize)
 
-mercury.setting_text = [
-[0.25, 'Merkür', 'batıyor', -1, False],
-[0.51, 'Merkür', 'batıyor', -1, False],
-[0.89, 'Merkür', '~~batıyor', -1, False]
-]
-venus.setting_text = [
-[0.91, 'Venüs batıyor', '~', 0, True],
-]
-mars.setting_text = [
-[0.07, '~', 'Mars bt.', -1, False]
-]
-jupiter.setting_text = [
-[0.1, '~', 'Jüpiter batıyor', -1, False],
-[0.9, '~', 'Jüpiter batıyor', -1, False]
-]
-saturn.setting_text = [
-[0.4, 'Satürn batıyor', '~', 0, False]
-]
-uranus.setting_text = [
-[0.13, '~', 'Uranüs batıyor', -1, False],
-[0.87, '~', 'Uranüs batıyor', -1, False]
-]
-neptune.setting_text = [
-[0.09, 'Neptün batıyor', '~', 0, False],
-[0.78, 'Neptün batıyor', '~', 0, False]
-]
-m31.setting_text = [
-[0.15, '~', 'M31 batıyor', -1, False],
-[0.94, '~', 'M31 batıyor', -1, False]
-]
-m45.setting_text = [
-[0.35, '~', 'M45 batıyor', -1, False],
-[0.960, '~', 'M45 batıyor', -1, False]
-]
-m42.setting_text = [
-[0.35, 'M42 batıyor', '~', 0, False],
-[0.965, 'M42 batıyor', '~', 0, False]
-]
-antares.setting_text = [
-[0.45, 'Antares batıyor', '~', 0, False]
-]
 for sb in setting_bodies :
     for sttxt in sb.setting_text :
         add_text_to_path(clc, chart, sb.setting, sttxt[0],
