@@ -26,6 +26,26 @@ from scipy import optimize
 
 PI = atan(1)*4.0
 
+class PyEph_body() :
+    def __init__(self, pyephem_name, clr=color.cmyk.Gray,
+            symbol='~', tsize='small') :
+        self.body = pyephem_name
+        self.color = clr
+        self.symbol = symbol
+        self.tsize = tsize
+        self.rising = []
+        self.rising_text = []
+        self.transit = []
+        self.transit_text = []
+        self.setting = []
+        self.setting_text = []
+    def update_rising(self, obs) :
+        self.rising.append(obs.next_rising(self.body))
+    def update_transit(self, obs) :
+        self.transit.append(obs.next_transit(self.body))
+    def update_setting(self, obs) :
+        self.setting.append(obs.next_setting(self.body))
+
 def to_chart_coord(event_time, chart) :
     diff =  event_time - chart.ULcorn
     X = fmod(diff,1)

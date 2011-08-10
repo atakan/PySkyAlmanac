@@ -18,13 +18,9 @@
 
 from __future__ import division, print_function
 
-from math import floor, fmod, fabs, atan2, atan, asin, sqrt, sin, cos
 import datetime, calendar, ephem, pytz, pyx
 from datetime import timedelta as TD
-from pyx import path, canvas, color, style, text, graph
 
-from almanac_bg import *
-from almanac_moon import *
 from almanac_utils import *
 
 # Local stuff: Here we set the observer's location, timezone and DST
@@ -71,25 +67,6 @@ first_sunday_datetime = datetime.datetime(year, 1, first_sunday, 12, tzinfo=obsT
 #        dst_end = ephem.Date(sunday_datetime.astimezone(utcTZ))
 
 # Objects to be plotted on the chart
-class PyEph_body() :
-    def __init__(self, pyephem_name, clr=color.cmyk.Gray,
-            symbol='~', tsize='small') :
-        self.body = pyephem_name
-        self.color = clr
-        self.symbol = symbol
-        self.tsize = tsize
-        self.rising = []
-        self.rising_text = []
-        self.transit = []
-        self.transit_text = []
-        self.setting = []
-        self.setting_text = []
-    def update_rising(self, obs) :
-        self.rising.append(obs.next_rising(self.body))
-    def update_transit(self, obs) :
-        self.transit.append(obs.next_transit(self.body))
-    def update_setting(self, obs) :
-        self.setting.append(obs.next_setting(self.body))
 # planets
 mercury = PyEph_body(ephem.Mercury(), color.cmyk.BurntOrange)
 venus =   PyEph_body(ephem.Venus(), color.cmyk.CornflowerBlue)
