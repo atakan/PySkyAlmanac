@@ -1,7 +1,7 @@
 \documentclass[12pt]{article}
 \usepackage{ucs}
 \usepackage[utf8x]{inputenc}
-\usepackage[turkish,english]{babel}
+\usepackage[turkish]{babel}
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage[sc]{mathpazo}
@@ -39,6 +39,21 @@
 \\ {27}t{0}{10.0}
 \\ {41}t{3.5}{6.5}
 \\ {42}e{10}}
+\newcommand\almrrightshape{
+   {8.5}
+   {0}b{0}
+\\ {0}t{4.7}{3.3}
+\\ {1}t{4}{4}
+\\ {5}t{2.5}{5.5}
+\\ {8}t{2.1}{5.9}
+\\ {9}t{2.1}{5.9}
+%\\ {15}t{-0.6}{10.6}
+%\\ {17}t{-1}{11.0}
+%\\ {19}t{-1.2}{11.2}
+%\\ {21}t{-1}{11.0}
+%\\ {27}t{0}{10.0}
+%\\ {41}t{3.5}{6.5}
+\\ {9}e{2}}
 \begin{document}
 %\maketitle
 \shorthandoff{=}
@@ -50,19 +65,10 @@
 \noindent
 \centerline{\includegraphics[clip,height=0.9\textheight]{almanac_2012_AFL}}
 
-%\centerline{\raisebox{1in}{\includegraphics[clip,height=1.3975in]{afl_4_1}}
-%     \fontsize{40pt}{40pt}\selectfont
-%     \quad Ankara Fen Lisesi için Gökyüzü Almanağı \quad
-%\raisebox{1in}{\includegraphics[clip,height=1.3975in]{afl_4_1}}}
-%\vskip -2cm
-%\noindent
-%\centerline{\includegraphics[clip,height=0.9\textheight]{almanac_2012_AFL}}
-
-\vskip -0.9\textheight \vskip10.5cm
+\vskip -0.9\textheight \vskip9.5cm
 \noindent
 \cutout{l}(0cm,0pt)
 \shapepar{\almleftshape}{\fontsize{13pt}{13pt}\selectfont
-\selectlanguage{turkish}
 \hskip0.4cm\textbf{Çizelgenin Kullanımı}\\
 Bu çizelge 2012 yılı için, Ankara Fen Lisesi'nde çeşitli
 gök cisimlerinin doğma, meridyenden (gökyüzünde ulaştıkları en
@@ -95,24 +101,42 @@ açı derecesi yükseklik için doğma zamanı 4 dakika geç, batma zamanı da
 aynı miktarda erken olacak. Benzer biçimde, yüksek bir noktadan gözlem
 yapıldığı için ufuk çizgisi olması gerekenin altında ise, doğma ve batma
 zamanlarının düzeltilmesi gerekecek.\\
-Not: Yaz saati uygulamasının olduğu zamanlarda,
-çizelgedeki zamanlara
-bir saat eklemek gerekiyor.\\
-~}
-\vskip -6.7cm
+Not: Yaz saati uygulamasının olduğu zamanlarda, çizelgedeki zamanlara
+bir saat eklemek gerekiyor.}
+\vskip -3.0cm
 \cutout{r}(2em,6cm)
-\shapepar{\almrightshape}{\fontsize{13pt}{13pt}\selectfont
-\selectlanguage{english}
-\hskip 1.2cm\textbf{Bazı Gök Olayları}\\
-6 Haziran 2012 Venüs Geçişi:\\
-Bundan önce 8 Haziran 2004 tarihinde izlediğimiz Venüs geçişi bu sefer 6
-Haziran 2012'de gerçekleşecek. Bundan sonraki ilk Venüs geçişi içinse
-yaklaşık
-\hskip 1.2cm\textbf{Göktaşı Yağmurları}\\
-3-4 Ocak: Quadrantid (Dörtlük)\\
-22-23 Nisan: Lyrid (Lir) 
-\\ ~}
-\vskip 46.9cm \footnotesize
+\shapepar{\almrrightshape}{\fontsize{13pt}{13pt}\selectfont
+\hskip 0.6cm\textbf{Bazı Gök Olayları}\\
+Bu yılın, belki de bu yüzyılın, en önemli gök olayı 6 Haziran 2012'deki
+\textbf{Venüs Geçişi}. Venüs'ün Güneş'in önünden geçişi arası sekiz
+yıllık çiftler halinde oluyor, bu çiftlerin arasındaki zamansa 121,5 ya
+da 105,5 yıl. Bir önceki geçiş 8 Haziran 2004'teydi, bir sonraki
+geçiş ise Aralık 2117'de olacak. Geçiş TSİ 01:10'da başlayacak, bu
+sırada Güneş ufkun altında olacak, geçiş Güneş doğduktan sonra TSİ
+7:50'de bitecek. (Gerekli önlemleri almadan Güneş'e
+kesinlikle bakmayınız! Bunun nasıl yapılacağı ile ilgili bilgiyi şu
+adreste bulabilirsiniz:\\
+\url{http://www.tug.tubitak.gov.tr/tutulma/turkish/guvenli_gunes_gozlemi/guvenli_gunes_gozlemi.html})\\
+Bu yılın sonlarına doğru, 28 Kasım 2012'de bir \textbf{Parçalı Ay
+Tutulması} göreceğiz. Bu tutulma TSİ 14:15-18:51 arasında olacak.
+Ülkemizde Ay doğarken tutulma önceden başlamış olacak.}
 
-{\hfill M. Atakan Gürkan ('92) \quad \url{https://github.com/atakan/PySkyAlmanac/AFL}}
+\vskip20cm\hskip32cm
+\parbox{7.3cm}{\textbf{Göktaşı Yağmurları}\\
+Quadrantid (Dörtlük): 3-4 Ocak\\
+Lyrid (Lir): 22-23 Nisan\\
+Eta Aquarid (Eta Kova): 4-5 Mayıs\\
+Delta Aq. (Delta Kova): 27-28 Temmuz\\
+Perseid (Perse): 12-13 Ağustos\\
+Orionid (Avcı): 20-21 Ekim\\
+Leonid (Aslan): 17-18 Kasım\\
+Geminid (İkizler): 13-14 Aralık\\
+Verilen tarihler yağmurların en yoğun olduğu zamanlardır, bunların bir
+kaç gün öncesi ve sonrasında da normalden çok sayıda göktaşı
+gözlenebilir.}
+
+\vskip 17.3cm \footnotesize
+{Hazırlayan: M. Atakan Gürkan ('92) \quad \url{https://github.com/atakan/PySkyAlmanac/AFL} Gök olayları ve göktaşı yağmurları hakkındaki bilgiler Alp Akoğlu ve
+Tuncay Özışık tarafından hazırlanan 2012 Gök Olayları Yıllığı'ndan
+alınmıştır.}
 \end{document}
