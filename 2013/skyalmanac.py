@@ -395,12 +395,12 @@ c.text(12., -1.7,
               r'{\footnotesize\sffamily M45: Yedi Kızkardeşler}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
 
-c.text(0.0, chart.height/2.0,
-       r'{\tiny{\sffamily PySkyAlmanac:} {\ttfamily https://github.com/atakan/PySkyAlmanac}}',
-       [
-        text.halign.center,text.valign.bottom,
-        pyx.trafo.rotate(90),
-        color.cmyk.Black])
+#c.text(0.0, chart.height/2.0,
+#       r'{\tiny{\sffamily PySkyAlmanac:} {\ttfamily https://github.com/atakan/PySkyAlmanac}}',
+#       [
+#        text.halign.center,text.valign.bottom,
+#        pyx.trafo.rotate(90),
+#        color.cmyk.Black])
 
 c.writePDFfile("almanac_%d_Ankara" % (year))
 
