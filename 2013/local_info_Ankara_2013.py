@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#    Copyright (C) 2011  Mehmet Atakan Gürkan
+#    Copyright (C) 2011-2012  Mehmet Atakan Gürkan
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License version 3 as
@@ -39,7 +39,7 @@ obs.long = '32.807'
 obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal time, +3 summer time
 utcTZ = pytz.timezone('UTC')
 
-year = 2011
+year = 2013
 begin_day_datetime = datetime.datetime(year-1, 12, 31, 12, tzinfo=obsTZ) # noon of the last day of previous year
 begin_day = ephem.Date(begin_day_datetime.astimezone(utcTZ)) # convert to UTC
 if calendar.isleap(year) :
@@ -93,38 +93,38 @@ pollux     = PyEph_body(ephem.star('Pollux'), symbol='Pol', tsize='tiny')
 arcturus   = PyEph_body(ephem.star('Arcturus'), symbol='Arc', tsize='tiny')
 
 mercury.rising_text = [
-[0.1, 'Merkür', 'doğuyor', -1, True],
-[0.43, 'Merkür', 'doğuyor', -1, False],
-[0.72, 'Merkür', 'doğuyor', -1, True],
-[0.931, 'Merkür', 'doğuyor', -1, False]
+[0.04, '~', 'Merk. doğ.', -1, True],
+[0.30, 'Merkür doğuyor', '~', -1, False],
+[0.63, 'Merkür', 'doğuyor', -1, True],
+[0.85, 'Merkür', 'doğuyor', -1, False]
 ]
 venus.rising_text = [
-[0.1, 'Venüs doğuyor', '~', -1, True]
+[0.06, 'Venüs doğuyor', '~', -1, True]
 ]
 mars.rising_text = [
-[0.55, 'Mars doğuyor', '~', 0, False]
+[0.73, 'Mars doğuyor', '~', 0, False]
 ]
 jupiter.rising_text = [
-[0.6, 'Jüpiter doğuyor', '~', 0, False]
+[0.63, 'Jüpiter doğuyor', '~', 0, False]
 ]
 saturn.rising_text = [
-[0.14, 'Satürn doğuyor', '~', 0, False],
-[0.83, 'Satürn doğuyor', '~', 0, False]
+[0.2, 'Satürn doğuyor', '~', 0, False],
+[0.94, 'Satürn doğuyor', '~', 0, False]
 ]
 uranus.rising_text = [
-[0.6, 'Uranüs doğuyor', '~', -1, False]
+[0.43, 'Uranüs doğuyor', '~', -1, False]
 ]
 neptune.rising_text = [
-[0.34, 'Neptün doğuyor', '~', 0, False]
+[0.35, 'Neptün doğuyor', '~', 0, False]
 ]
 m31.rising_text = [
-[0.24, 'M31 doğuyor', '~', 0, False]
+[0.36, '~', 'M31 doğuyor', -1, False]
 ]
 m45.rising_text = [
 [0.57, 'M45 doğuyor', '~', 0, False]
 ]
 m42.rising_text = [
-[0.73, 'M42 doğuyor', '~', 0, False]
+[0.82, 'M42 doğuyor', '~', 0, False]
 ]
 antares.rising_text = [
 [0.1, 'Antares doğuyor', '~', 0, False],
@@ -132,83 +132,84 @@ antares.rising_text = [
 ]
 
 mars.transit_text = [
-[0.925, 'Mars meridyende', '~', 0, False]
+[0.96, 'Mars meridyende', '~', 0, False]
 ]
 jupiter.transit_text = [
-[0.7, 'Jüpiter meridyende', '~', 0, False]
+[0.08, '~', 'Jüpiter meridyende', -1, False],
+[0.87, 'Jüpiter meridyende', '~', 0, False]
 ]
 saturn.transit_text = [
-[0.25, 'Satürn meridyende', '~', 0, False]
+[0.3, '~', 'Satürn meridyende', -1, False]
 ]
 uranus.transit_text = [
-[0.75, '~', 'Uranüs meridyende', -1, False]
+[0.036, '~', 'Ura. mrd.', -1, False],
+[0.75, 'Uranüs meridyende', '~', -1, False]
 ]
 neptune.transit_text = [
 [0.67, 'Neptün meridyende', '~', 0, False]
 ]
 m31.transit_text = [
-[0.035, '~', 'M31 meridyende', -1, False],
-[0.77, '~', 'M31 meridyende', -1, False]
+[0.04, '~', 'M31 mrd.', -1, False],
+[0.85, '~', 'M31 meridyende', -1, False]
 ]
 m45.transit_text = [
 [0.08, '~', 'M45 meridyende', -1, False],
-[0.83, '~', 'M45 meridyende', -1, False]
+[0.87, '~', 'M45 meridyende', -1, False]
 ]
 m42.transit_text = [
-[0.13, 'M42 meridyende', '~', 0, False],
-[0.87, 'M42 meridyende', '~', 0, False]
+[0.12, 'M42 meridyende', '~', 0, False],
+[0.85, 'M42 meridyende', '~', 0, False]
 ]
 antares.transit_text = [
 [0.18, 'Antares meridyende', '~', 0, False],
-[0.963, 'Antares mrd.', '~', 0, False]
+[0.9, 'Antares mrd.', '~', 0, False]
 ]
 arcturus.transit_text = [
-[0.2, 'Arcturus meridyende', '~', 0, False]
+[0.23, 'Arkturus meridyende', '~', 0, False]
 ]
 pollux.transit_text = [
-[0.2, 'Pollux', 'meridyende', -1, False],
-[0.94, 'Pollux meridyende', '~', 0, False]
+[0.15, 'Polluks meridyende', '~', 0, False],
+[0.9, '~', 'Polluks meridyende', -1, False]
 ]
 deneb.transit_text = [
-[0.68, 'Deneb meridyende', '~', 0, False],
+[0.65, '~', 'Deneb meridyende', -1, False],
 ]
 
 mercury.setting_text = [
-[0.25, 'Merkür', 'batıyor', -1, False],
-[0.51, 'Merkür', 'batıyor', -1, False],
-[0.89, 'Merkür', '~~batıyor', -1, False]
+[0.1, 'Merkür', 'batıyor', -1, True],
+[0.505, 'Merkür', 'batıyor', -1, False],
+[0.75, 'Merkür batıyor', '~', 0, False]
 ]
 venus.setting_text = [
-[0.91, 'Venüs batıyor', '~', 0, True],
+[0.82, '~', 'Venüs batıyor', -1, True],
 ]
 mars.setting_text = [
-[0.07, '~', 'Mars bt.', -1, False]
+[0.21, '~', 'Mars batıyor', -2, False]
 ]
 jupiter.setting_text = [
-[0.1, '~', 'Jüpiter batıyor', -1, False],
-[0.9, '~', 'Jüpiter batıyor', -1, False]
+[0.25, '~', 'Jüpiter batıyor', -1, False]
 ]
 saturn.setting_text = [
-[0.4, 'Satürn batıyor', '~', 0, False]
+[0.52, 'Satürn batıyor', '~', 0, False]
 ]
 uranus.setting_text = [
 [0.13, '~', 'Uranüs batıyor', -1, False],
-[0.87, '~', 'Uranüs batıyor', -1, False]
+[0.87, 'Uranüs batıyor', '~', 0, False]
 ]
 neptune.setting_text = [
-[0.09, 'Neptün batıyor', '~', 0, False],
-[0.78, 'Neptün batıyor', '~', 0, False]
+[0.075, 'Neptün batıyor', '~', 0, False],
+[0.89, 'Neptün batıyor', '~', 0, False]
 ]
 m31.setting_text = [
-[0.15, '~', 'M31 batıyor', -1, False],
+[0.2, '~', 'M31 batıyor', -1, False],
 [0.94, '~', 'M31 batıyor', -1, False]
 ]
 m45.setting_text = [
-[0.35, '~', 'M45 batıyor', -1, False],
+[0.31, '~', 'M45 batıyor', -1, False],
 [0.960, '~', 'M45 batıyor', -1, False]
 ]
 m42.setting_text = [
-[0.35, 'M42 batıyor', '~', 0, False],
+[0.32, 'M42 batıyor', '~', 0, False],
 [0.965, 'M42 batıyor', '~', 0, False]
 ]
 antares.setting_text = [

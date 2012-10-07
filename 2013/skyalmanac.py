@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#    Copyright (C) 2011  Mehmet Atakan Gürkan
+#    Copyright (C) 2011-2012  Mehmet Atakan Gürkan
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License version 3 as
@@ -26,10 +26,10 @@ from pyx import path, canvas, color, style, text, graph
 from almanac_bg import *
 from almanac_moon import *
 from almanac_utils import *
-from local_info_Ankara_2011 import obs, obsTZ, utcTZ, year
-from local_info_Ankara_2011 import begin_day, begin_day_datetime, no_days
-from local_info_Ankara_2011 import first_sunday, first_sunday_datetime
-from local_info_Ankara_2011 import rising_bodies, transit_bodies, setting_bodies
+from local_info_Ankara_2013 import obs, obsTZ, utcTZ, year
+from local_info_Ankara_2013 import begin_day, begin_day_datetime, no_days
+from local_info_Ankara_2013 import first_sunday, first_sunday_datetime
+from local_info_Ankara_2013 import rising_bodies, transit_bodies, setting_bodies
 
 mnt_names = ['sıfırıncı', 'Ocak', 'Şubat', 'Mart',
           'Nisan', 'Mayıs', 'Haziran', 'Temmuz',
@@ -118,8 +118,8 @@ clippath2 = clippath2.joined(event_to_path([sun_rise[0]-2.0] +
 clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
-#make_alm_bg(bclc, begin_day_datetime, no_days, chart,
-#        obs, sun, sun_set, sun_rise) 
+make_alm_bg(bclc, begin_day_datetime, no_days, chart,
+        obs, sun, sun_set, sun_rise) 
 make_alm_bg_vdots(bclc, first_sunday, no_days, chart) 
 make_alm_bg_hdots(bclc, first_sunday, no_days, chart) 
 
@@ -195,15 +195,39 @@ def add_text_to_path(canv, chart, ev, pos,
 #    canv.stroke(path.line(x,y,x-2.0*sin(slope),y+2.0*cos(slope)))
 
 # Moon
-#make_moon_stuff(mclc, clc, begin_day, no_days, chart, obs)
+make_moon_stuff(mclc, clc, begin_day, no_days, chart, obs)
 
 # Planets etc.
 for rb in rising_bodies :
     clc.stroke(event_to_path(rb.rising, chart), [rb.color])
+#    for i in range(9) :
+#        add_text_to_path(clc, chart, rb.rising, (i+1)*0.1,
+#                txt1=('%d' % (i+1)), txt2=('%d' % (i+1)), offset=0,
+#                rotate=False, txt_color=rb.color, txt_size=rb.tsize)
+#    for i in range(10) :
+#        add_text_to_path(clc, chart, rb.rising, i*0.1+0.05,
+#                txt1='.', txt2='.', offset=0,
+#                rotate=False, txt_color=rb.color, txt_size=rb.tsize)
 for sb in setting_bodies :
     clc.stroke(event_to_path(sb.setting, chart), [sb.color])
+#    for i in range(9) :
+#        add_text_to_path(clc, chart, sb.setting, (i+1)*0.1,
+#                txt1=('%d' % (i+1)), txt2=('%d' % (i+1)), offset=0,
+#                rotate=False, txt_color=sb.color, txt_size=sb.tsize)
+#    for i in range(10) :
+#        add_text_to_path(clc, chart, sb.setting, i*0.1+0.05,
+#                txt1='.', txt2='.', offset=0,
+#                rotate=False, txt_color=sb.color, txt_size=sb.tsize)
 for tb in transit_bodies :
     clc.stroke(event_to_path(tb.transit, chart), [tb.color])
+#    for i in range(9) :
+#        add_text_to_path(clc, chart, tb.transit, (i+1)*0.1,
+#                txt1=('%d' % (i+1)), txt2=('%d' % (i+1)), offset=0,
+#                rotate=False, txt_color=tb.color, txt_size=tb.tsize)
+#    for i in range(10) :
+#        add_text_to_path(clc, chart, tb.transit, i*0.1+0.05,
+#                txt1='.', txt2='.', offset=0,
+#                rotate=False, txt_color=tb.color, txt_size=tb.tsize)
 
 for rb in rising_bodies :
     for rstxt in rb.rising_text :
@@ -289,16 +313,16 @@ for i, tlab in enumerate(['17', '18', '19', '20',
     x = (i+1)*xincr
     y1 = -0.25
     y2 = chart.height+0.15
-    c.text(x, y1, tlab, [text.halign.center, text.valign.baseline])
-    c.text(x, y2, tlab, [text.halign.center, text.valign.baseline])
+    c.text(x, y1, r'\sffamily %s' % (tlab), [text.halign.center, text.valign.baseline])
+    c.text(x, y2, r'\sffamily %s' % (tlab), [text.halign.center, text.valign.baseline])
 x = chart.width*3.0/12.0
 y1 = -0.75
 y2 = chart.height+0.65
 #c.text(x, y1, 'AKŞAM', [text.halign.center, text.valign.baseline])
-c.text(x, y2, 'AKŞAM', [text.halign.center, text.valign.baseline])
+c.text(x, y2, r'\sffamily AKŞAM', [text.halign.center, text.valign.baseline])
 x = chart.width*9.0/12.0
 #c.text(x, y1, 'SABAH', [text.halign.center, text.valign.baseline])
-c.text(x, y2, 'SABAH', [text.halign.center, text.valign.baseline])
+c.text(x, y2, r'\sffamily SABAH', [text.halign.center, text.valign.baseline])
 
 ## background colouring around the chart to indicate DST
 #outDST_col = color.rgb(205.0/255.0, 205.0/255.0, 1.0)
@@ -323,9 +347,9 @@ for sunday in range(first_sunday, no_days, 7) :
     mor_x, mor_y = to_chart_coord(sun_set[sunday], chart)
     eve_date = begin_day_datetime + TD(days=sunday, hours=16)
     eve_x, eve_y = to_chart_coord(sun_rise[sunday], chart)
-    c.text(mor_x-0.2, y, '%s' % (mor_date.day),
+    c.text(mor_x-0.2, y, r'\sffamily %s' % (mor_date.day),
             [text.halign.right, text.valign.middle])
-    c.text(eve_x+0.2, y, '%s' % (eve_date.day),
+    c.text(eve_x+0.2, y, r'\sffamily %s' % (eve_date.day),
             [text.halign.left, text.valign.middle])
 # month labels
 for i in range(1,13) :
@@ -338,7 +362,7 @@ for i in range(1,13) :
     xa, ya = to_chart_coord(sun_set[n_dt2+1], chart)
     slope = atan2(ya-yb, xa-xb) 
     c.text(x-1, y,
-        r'\begin{turn}{%d}{\Large %s}\end{turn}' %
+        r'\begin{turn}{%d}{\Large\sffamily %s}\end{turn}' %
         (slope*180/PI, mnt_names[i]),
         [text.halign.center, text.valign.middle])
     dt1_datetime = datetime.datetime(year, i, 14, 12, tzinfo=obsTZ) 
@@ -350,7 +374,7 @@ for i in range(1,13) :
     xa, ya = to_chart_coord(sun_rise[n_dt2+1], chart)
     slope = atan2(ya-yb, xa-xb) 
     c.text(x+1, y,
-        r'\begin{turn}{%d}{\Large %s}\end{turn}' %
+        r'\begin{turn}{%d}{\Large\sffamily %s}\end{turn}' %
         (slope*180/PI, mnt_names[i]),
         [text.halign.center, text.valign.middle])
 
