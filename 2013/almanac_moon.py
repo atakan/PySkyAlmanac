@@ -82,6 +82,8 @@ def waning_moon(X, r, cx, cy) :
 
 def make_moon_stuff(outer_canv, inner_canv, begin_day, no_days, chart,
         obs):
+    small_moon_rad = 0.12
+    large_moon_rad = 0.16
     moon = ephem.Moon()
     moon2 = ephem.Moon()
     for doy in range(no_days) :
@@ -95,18 +97,18 @@ def make_moon_stuff(outer_canv, inner_canv, begin_day, no_days, chart,
         if (fabs(ephem.next_full_moon(mpc) - mpc) < 0.5 or
             fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
             # full moon
-            outer_canv.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+            outer_canv.stroke(path.circle(x,y,large_moon_rad),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
         elif ((X < 0.55 and X > 0.45) or 
               fabs(ephem.next_first_quarter_moon(mpc) - mpc) < 0.5 or
               fabs(ephem.previous_first_quarter_moon(mpc) - mpc) < 0.5) :
             # first quarter
-            outer_canv.stroke(first_quarter_moon(0.12, x,y),[mooncolordark,pyx.deco.filled([mooncolordark])])
+            outer_canv.stroke(first_quarter_moon(large_moon_rad, x,y),[mooncolordark,pyx.deco.filled([mooncolordark])])
         elif (fabs(ephem.next_new_moon(mpc) - mpc) < 0.5 or
               fabs(ephem.previous_new_moon(mpc) - mpc) < 0.5):
             # new moon
-            outer_canv.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
+            outer_canv.stroke(path.circle(x,y,large_moon_rad),[mooncolorlight,pyx.deco.filled([mooncolordark])])
         else :
-            inner_canv.fill(waxing_moon(X, 0.08, x, y),
+            inner_canv.fill(waxing_moon(X, small_moon_rad, x, y),
                     [style.linejoin.bevel,mooncolordark])
         # Waning moon (moonrises)
         moon_rise = obs.next_rising(moon)
@@ -116,28 +118,30 @@ def make_moon_stuff(outer_canv, inner_canv, begin_day, no_days, chart,
         if (fabs(ephem.next_full_moon(mpc) - mpc) < 0.5 or
             fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
             # full moon
-            outer_canv.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+            outer_canv.stroke(path.circle(x,y,large_moon_rad),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
         elif ((X < 0.55 and X > 0.45) or 
               fabs(ephem.next_last_quarter_moon(mpc) - mpc) < 0.5 or
               fabs(ephem.previous_last_quarter_moon(mpc) - mpc) < 0.5) :
             # last quarter
-            outer_canv.stroke(last_quarter_moon(0.12, x,y),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+            outer_canv.stroke(last_quarter_moon(large_moon_rad, x,y),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
         elif (fabs(ephem.next_new_moon(mpc) - mpc) < 0.5 or
               fabs(ephem.previous_new_moon(mpc) - mpc) < 0.5):
             # new moon
-            outer_canv.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
+            outer_canv.stroke(path.circle(x,y,large_moon_rad),[mooncolorlight,pyx.deco.filled([mooncolordark])])
         else :
-            inner_canv.fill(waning_moon(X, 0.08, x, y),
+            inner_canv.fill(waning_moon(X, small_moon_rad, x, y),
                     [style.linejoin.bevel,mooncolorlight])
 
 def make_moon_key(canv, chart) :
+    large_moon_rad = 0.16
+    small_moon_rad = 0.12
     x = 0.0
     y = -1.8
     canv.fill(path.rect(x, y, chart.width, 1.0), 
             [color.rgb(0.0, 0.0, 0.0)])
     for i in range(8) :
         X = 1.0-(i+1.0)/9.0
-        canv.fill(waning_moon(X, 0.08, x+(i+4.0)/4.0, -1.3),
+        canv.fill(waning_moon(X, small_moon_rad, x+(i+4.0)/4.0, -1.3),
                     [style.linejoin.bevel,mooncolorlight])
     canv.text(x+1.8, -1.1,
               r'{\footnotesize\sffamily Küçülen Ay}',
@@ -147,7 +151,7 @@ def make_moon_key(canv, chart) :
               [text.halign.center,text.valign.baseline,mooncolorlight])
     for i in range(8) :
         X = (i+1.0)/9.0
-        canv.fill(waxing_moon(X, 0.08, x+(i+4.0)/4.0+3.0, -1.3),
+        canv.fill(waxing_moon(X, small_moon_rad, x+(i+4.0)/4.0+3.0, -1.3),
                     [style.linejoin.bevel,mooncolordark])
     canv.text(x+1.8+3.0, -1.1,
               r'{\footnotesize\sffamily Büyüyen Ay}',
@@ -157,15 +161,15 @@ def make_moon_key(canv, chart) :
               [text.halign.center,text.valign.baseline,mooncolordark])
     # new moon, first quarter
     # full moon,  last quarter
-    canv.stroke(path.circle(x+8.5,-1.1,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
+    canv.stroke(path.circle(x+8.5,-1.1,large_moon_rad),[mooncolorlight,pyx.deco.filled([mooncolordark])])
     canv.text(x+8.25, -1.2, r'{\footnotesize\sffamily Yeni ay}',
             [text.halign.right,text.valign.baseline, mooncolordark])
-    canv.stroke(first_quarter_moon(0.12, x+8.9,-1.1),[mooncolordark,pyx.deco.filled([mooncolordark])])
+    canv.stroke(first_quarter_moon(large_moon_rad, x+8.9,-1.1),[mooncolordark,pyx.deco.filled([mooncolordark])])
     canv.text(x+9.25, -1.2, r'{\footnotesize\sffamily İlk dördün}',
             [text.halign.left,text.valign.baseline, mooncolordark])
-    canv.stroke(path.circle(x+8.5,-1.5,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+    canv.stroke(path.circle(x+8.5,-1.5,large_moon_rad),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
     canv.text(x+8.25, -1.6, r'{\footnotesize\sffamily Dolunay}',
             [text.halign.right,text.valign.baseline, mooncolorlight])
-    canv.stroke(last_quarter_moon(0.12, x+8.9,-1.5),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
+    canv.stroke(last_quarter_moon(large_moon_rad, x+8.9,-1.5),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
     canv.text(x+9.25, -1.6, r'{\footnotesize\sffamily Son dördün}',
             [text.halign.left,text.valign.baseline, mooncolorlight])
