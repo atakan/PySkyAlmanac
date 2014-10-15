@@ -20,6 +20,7 @@ from __future__ import division, print_function
 
 from math import floor, fmod, fabs, atan2, atan, asin, sqrt, sin, cos
 import datetime, calendar, ephem, pytz, pyx
+import locale
 from datetime import timedelta as TD
 from pyx import path, canvas, color, style, text, graph
 
@@ -31,11 +32,12 @@ from local_info_Ankara_2011 import begin_day, begin_day_datetime, no_days
 from local_info_Ankara_2011 import first_sunday, first_sunday_datetime
 from local_info_Ankara_2011 import rising_bodies, transit_bodies, setting_bodies
 
-mnt_names = ['sıfırıncı', 'Ocak', 'Şubat', 'Mart',
-          'Nisan', 'Mayıs', 'Haziran', 'Temmuz',
-          'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
-mnt_shortnames = ['SFR', 'OCA', 'ŞUB', 'MAR', 'NİS', 'MAY',
-               'HAZ', 'TEM', 'AĞU', 'EYL', 'EKİ', 'KAS', 'ARA']
+locale.setlocale(locale.LC_ALL,'')
+mnt_names = []
+mnt_shortnames = []
+for m in range(13):
+    mnt_names.append(calendar.month_name[m])
+    mnt_shortnames.append(calendar.month_abbr[m].upper())
 
 class Chart() :
     pass
@@ -119,9 +121,9 @@ clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
 #make_alm_bg(bclc, begin_day_datetime, no_days, chart,
-#        obs, sun, sun_set, sun_rise) 
-make_alm_bg_vdots(bclc, first_sunday, no_days, chart) 
-make_alm_bg_hdots(bclc, first_sunday, no_days, chart) 
+#        obs, sun, sun_set, sun_rise)
+make_alm_bg_vdots(bclc, first_sunday, no_days, chart)
+make_alm_bg_hdots(bclc, first_sunday, no_days, chart)
 
 # Twilight lines
 clc.stroke(event_to_path(eve_twilight, chart),
@@ -329,26 +331,26 @@ for sunday in range(first_sunday, no_days, 7) :
             [text.halign.left, text.valign.middle])
 # month labels
 for i in range(1,13) :
-    dt1_datetime = datetime.datetime(year, i, 14, 12, tzinfo=obsTZ) 
-    dt2_datetime = datetime.datetime(year, i, 15, 12, tzinfo=obsTZ) 
-    dt3_datetime = datetime.datetime(year, i, 16, 12, tzinfo=obsTZ) 
+    dt1_datetime = datetime.datetime(year, i, 14, 12, tzinfo=obsTZ)
+    dt2_datetime = datetime.datetime(year, i, 15, 12, tzinfo=obsTZ)
+    dt3_datetime = datetime.datetime(year, i, 16, 12, tzinfo=obsTZ)
     n_dt2 = int(dt2_datetime.strftime('%j'))
     x, y = to_chart_coord(sun_set[n_dt2], chart)
     xb, yb = to_chart_coord(sun_set[n_dt2-1], chart)
     xa, ya = to_chart_coord(sun_set[n_dt2+1], chart)
-    slope = atan2(ya-yb, xa-xb) 
+    slope = atan2(ya-yb, xa-xb)
     c.text(x-1, y,
         r'\begin{turn}{%d}{\Large %s}\end{turn}' %
         (slope*180/PI, mnt_names[i]),
         [text.halign.center, text.valign.middle])
-    dt1_datetime = datetime.datetime(year, i, 14, 12, tzinfo=obsTZ) 
-    dt2_datetime = datetime.datetime(year, i, 15, 12, tzinfo=obsTZ) 
-    dt3_datetime = datetime.datetime(year, i, 16, 12, tzinfo=obsTZ) 
+    dt1_datetime = datetime.datetime(year, i, 14, 12, tzinfo=obsTZ)
+    dt2_datetime = datetime.datetime(year, i, 15, 12, tzinfo=obsTZ)
+    dt3_datetime = datetime.datetime(year, i, 16, 12, tzinfo=obsTZ)
     n_dt2 = int(dt2_datetime.strftime('%j'))
     x, y = to_chart_coord(sun_rise[n_dt2], chart)
     xb, yb = to_chart_coord(sun_rise[n_dt2-1], chart)
     xa, ya = to_chart_coord(sun_rise[n_dt2+1], chart)
-    slope = atan2(ya-yb, xa-xb) 
+    slope = atan2(ya-yb, xa-xb)
     c.text(x+1, y,
         r'\begin{turn}{%d}{\Large %s}\end{turn}' %
         (slope*180/PI, mnt_names[i]),
@@ -379,4 +381,3 @@ c.text(0.0, chart.height/2.0,
         color.cmyk.Black])
 
 c.writePDFfile("almanac_%d_Ankara" % (year))
-
