@@ -27,10 +27,10 @@ from pyx import path, canvas, color, style, text, graph
 from almanac_bg import *
 from almanac_moon import *
 from almanac_utils import *
-from local_info_Ankara_2011 import obs, obsTZ, utcTZ, year
-from local_info_Ankara_2011 import begin_day, begin_day_datetime, no_days
-from local_info_Ankara_2011 import first_sunday, first_sunday_datetime
-from local_info_Ankara_2011 import rising_bodies, transit_bodies, setting_bodies
+from local_info import obs, obsTZ, utcTZ, year
+from local_info import begin_day, begin_day_datetime, no_days
+from local_info import first_sunday, first_sunday_datetime
+from local_info import rising_bodies, transit_bodies, setting_bodies
 
 locale.setlocale(locale.LC_ALL,'')
 mnt_names = []
@@ -380,4 +380,15 @@ c.text(0.0, chart.height/2.0,
         pyx.trafo.rotate(90),
         color.cmyk.Black])
 
-c.writePDFfile("almanac_%d_Ankara" % (year))
+try:
+    from local_info import obs_city
+    output_filename = 'almanac_{}_{}'.format(year,obs_city.replace(' ','_'))
+except:
+    try:
+        output_lon = str(obs.long).split(':')[0]#.replace('-','n')
+        output_lat = str(obs.lat).split(':')[0]#.replace('-','n')
+        output_filename = 'almanac_{}_{}_{}'.format(year,output_lat,output_lon)
+    except:
+        output_filename = 'almanac_{}'.format(year)
+
+c.writePDFfile(output_filename)

@@ -30,3 +30,6 @@ Atakan Gürkan <ato.gurkan@gmail.com>
 * PyEphem - `pip install pyephem`
 * PyX - If using Python2, need older version of PyX like [0.12.1](http://sourceforge.net/projects/pyx/files/pyx/0.12.1/). Python3, can use current stable release. Download tarball and run `python ./setup.py install`.
 * SciPy - Install full stack with `apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose`. See [here](http://www.scipy.org/install.html).
+
+##Instructions
+See `local_info.py` to see options for setting your location. You only have to change the `obs_city` field. That is, `obs_city = 'San Francisco'`. It is of course possible your city isn't [listed](https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py), so in that case switch the `manually_set` flag to `True` and fill in your latitude, longitude, year, and timezone.
