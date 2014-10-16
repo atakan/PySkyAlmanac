@@ -16,7 +16,7 @@ tr = {
     'firstquarter':'İlk dördün',
     'fullmoon':'Dolunay',
     'lastquarter':'Son dördün',
-    'rising':'doğuyor',
+    'rises':'doğuyor',
     'mercury':'Merkür',
     'venus':'Venüs',
     'mars':'Mars',
@@ -25,17 +25,17 @@ tr = {
     'uranus':'Uranüs',
     'neptune':'Neptün',
     'antares':'Antares',
-    'transit':'meridyende',
-    'transit_abbrev':'mrd.',
+    'transits':'meridyende',
+    'transits_abbrev':'mrd.',
     'arcturus':'Arcturus',
     'pollux':'Pollux',
     'deneb':'Deneb',
-    'setting':'batıyor',
-    'set_abbrev':'bt.',
+    'sets':'batıyor',
+    'sets_abbrev':'bt.',
 }
 #English
 en = {
-    'midnight':'midnight',
+    'midnight':'Midnight',
     'evening':'EVENING',
     'morning':'MORNING',
     'andromeda':'Andromeda Galaxy',
@@ -49,7 +49,7 @@ en = {
     'firstquarter':'First Quarter',
     'fullmoon':'Full Moon',
     'lastquarter':'Last Quarter',
-    'rising':'Rising',
+    'rises':'Rises',
     'mercury':'Mercury',
     'venus':'Venus',
     'mars':'Mars',
@@ -58,13 +58,13 @@ en = {
     'uranus':'Uranus',
     'neptune':'Neptune',
     'antares':'Antares',
-    'transit':'Transit',
-    'transit_abbrev':'Trns.',
+    'transits':'Transits',
+    'transits_abbrev':'Trns.',
     'arcturus':'Arcturus',
     'pollux':'Pollux',
     'deneb':'Deneb',
-    'setting':'setting',
-    'set_abbrev':'st.',
+    'sets':'Sets',
+    'sets_abbrev':'Sts.',
 }
 #Chinese
 ch = {
@@ -82,7 +82,7 @@ ch = {
   'firstquarter':'第一季',
   'fullmoon':'满月',
   'lastquarter':'上个季度',
-  'rising':'上升',
+  'rises':'上升',
   'mercury':'水星',
   'venus':'金星',
   'mars':'火星',
@@ -91,13 +91,13 @@ ch = {
   'uranus':'天王星',
   'neptune':'海王星',
   'antares':'安塔尔',
-  'transit':'中天',
-  'transit_abbrev':ch['transit'],
+  'transits':'中天',
+  'transits_abbrev':'中天',
   'arcturus':'大角',
   'pollux':'北河三',
   'deneb':'天津四',
-  'setting':'setting',
-  'set_abbrev':ch['setting'],
+  'sets':'套',
+  'sets_abbrev':'套',
 }
 #German
 de = {
@@ -118,4 +118,4 @@ if(experiment):
     else:
         t=en
 else: # otherwise manually set
-    t=tr
+    t=en
