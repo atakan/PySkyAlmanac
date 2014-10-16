@@ -35,3 +35,5 @@ Atakan Gürkan <ato.gurkan@gmail.com>
 See `local_info.py` to see options for setting your location. You only have to change the `obs_city` field. That is, `obs_city = 'San Francisco'`. It is of course possible your city isn't [listed](https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py), so in that case switch the `manually_set` flag to `True` and fill in your latitude, longitude, year, and timezone.
 
 Turkish, English and Chinese languages are supported. In `translations.py` change `t=tr` to either `en` or `ch`.
+
+Set `display_moon_stuff = True` or `False` for moon stuff.

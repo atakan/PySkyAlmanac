@@ -33,6 +33,9 @@ from local_info import first_sunday, first_sunday_datetime
 from local_info import rising_bodies, transit_bodies, setting_bodies
 from translations import t
 
+display_moon_stuff = True
+display_bg = False
+
 locale.setlocale(locale.LC_ALL,'')
 mnt_names = []
 mnt_shortnames = []
@@ -43,6 +46,7 @@ for m in range(13):
 class Chart() :
     pass
 chart = Chart()
+# Can calculate sunrise/set and twilight http://rhodesmill.org/pyephem/rise-set.html
 chart.ULcorn = ephem.date(begin_day+4*ephem.hour) # at 4pm (in Ankara Sun does not set earlier than 4pm)
 chart.URcorn = ephem.date(chart.ULcorn+16*ephem.hour) # 8 am next day (in Ankara Sun does not rise later than 8am)
 chart.LLcorn = ephem.date(chart.ULcorn+no_days)
@@ -56,11 +60,12 @@ sun = ephem.Sun()
 # locations much more further than the equator.
 eve_twilight = []
 mor_twilight = []
-obs.horizon = '-18'
+obs.horizon = '-18' # Astronomical twilight uses -18deg, Nautical twilight uses -12deg, and Civil twilight uses -6deg.
 for doy in range(no_days) :
     obs.date = begin_day + doy
-    eve_twilight.append(obs.next_setting(sun))
-    mor_twilight.append(obs.next_rising(sun))
+    # The above twilight def. specifies position of center of Sun, so to make use center of sun set `use_center`.
+    eve_twilight.append(obs.next_setting(sun, use_center=True))
+    mor_twilight.append(obs.next_rising(sun, use_center=True))
 obs.horizon = '0'
 
 # Normal Sunrise and Sunset
@@ -121,8 +126,8 @@ clippath2 = clippath2.joined(event_to_path([sun_rise[0]-2.0] +
 clippath2.append(path.closepath())
 mclc = canvas.canvas([canvas.clip(clippath2)])
 
-#make_alm_bg(bclc, begin_day_datetime, no_days, chart,
-#        obs, sun, sun_set, sun_rise)
+if(display_bg):
+    make_alm_bg(bclc, begin_day_datetime, no_days, chart, obs, sun, sun_set, sun_rise)
 make_alm_bg_vdots(bclc, first_sunday, no_days, chart)
 make_alm_bg_hdots(bclc, first_sunday, no_days, chart)
 
@@ -198,7 +203,8 @@ def add_text_to_path(canv, chart, ev, pos,
 #    canv.stroke(path.line(x,y,x-2.0*sin(slope),y+2.0*cos(slope)))
 
 # Moon
-#make_moon_stuff(mclc, clc, begin_day, no_days, chart, obs)
+if(display_moon_stuff):
+    make_moon_stuff(mclc, clc, begin_day, no_days, chart, obs)
 
 # Planets etc.
 for rb in rising_bodies :
