@@ -31,6 +31,7 @@ from local_info import obs, obsTZ, utcTZ, year
 from local_info import begin_day, begin_day_datetime, no_days
 from local_info import first_sunday, first_sunday_datetime
 from local_info import rising_bodies, transit_bodies, setting_bodies
+from translations import t
 
 locale.setlocale(locale.LC_ALL,'')
 mnt_names = []
@@ -285,7 +286,7 @@ xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
 #          '01:00', '02:00', '03:00', '04:00',
 #          '05:00', '06:00', '07:00']) :
 for i, tlab in enumerate(['17', '18', '19', '20',
-          '21', '22', '23', r'geceyarısı',
+          '21', '22', '23', t['midnight'],
           '01', '02', '03', '04',
           '05', '06', '07']) :
     x = (i+1)*xincr
@@ -296,11 +297,11 @@ for i, tlab in enumerate(['17', '18', '19', '20',
 x = chart.width*3.0/12.0
 y1 = -0.75
 y2 = chart.height+0.65
-#c.text(x, y1, 'AKŞAM', [text.halign.center, text.valign.baseline])
-c.text(x, y2, 'AKŞAM', [text.halign.center, text.valign.baseline])
+#c.text(x, y1, t['evening'], [text.halign.center, text.valign.baseline])
+c.text(x, y2, t['evening'], [text.halign.center, text.valign.baseline])
 x = chart.width*9.0/12.0
-#c.text(x, y1, 'SABAH', [text.halign.center, text.valign.baseline])
-c.text(x, y2, 'SABAH', [text.halign.center, text.valign.baseline])
+#c.text(x, y1, t['morning'], [text.halign.center, text.valign.baseline])
+c.text(x, y2, t['morning'], [text.halign.center, text.valign.baseline])
 
 ## background colouring around the chart to indicate DST
 #outDST_col = color.rgb(205.0/255.0, 205.0/255.0, 1.0)
@@ -364,13 +365,13 @@ c.stroke(event_to_path(sun_rise, chart))
 
 make_moon_key(c, chart)
 c.text(12., -1.1,
-              r'{\footnotesize\sffamily M31: Andromeda Gökadası}',
+              r'{\footnotesize\sffamily M31: '+t['andromeda']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
 c.text(12., -1.4,
-              r'{\footnotesize\sffamily M42: Avcı Bulutsusu}',
+              r'{\footnotesize\sffamily M42: '+t['orion']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
 c.text(12., -1.7,
-              r'{\footnotesize\sffamily M45: Yedi Kızkardeşler}',
+              r'{\footnotesize\sffamily M45: '+t['sevensisters']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
 
 c.text(0.0, chart.height/2.0,

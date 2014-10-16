@@ -22,6 +22,7 @@ import datetime, calendar, ephem, pytz, pyx
 from datetime import timedelta as TD
 
 from almanac_utils import *
+from translations import t
 
 # Local stuff: Here we set the observer's location, timezone and DST
 # conventions.
@@ -115,126 +116,124 @@ pollux     = PyEph_body(ephem.star('Pollux'), symbol='Pol', tsize='tiny')
 arcturus   = PyEph_body(ephem.star('Arcturus'), symbol='Arc', tsize='tiny')
 
 mercury.rising_text = [
-[0.1, 'Merkür', 'doğuyor', -1, True],
-[0.43, 'Merkür', 'doğuyor', -1, False],
-[0.72, 'Merkür', 'doğuyor', -1, True],
-[0.931, 'Merkür', 'doğuyor', -1, False]
+[0.1, t['mercury'], t['rising'], -1, True],
+[0.43, t['mercury'], t['rising'], -1, False],
+[0.72, t['mercury'], t['rising'], -1, True],
+[0.931, t['mercury'], t['rising'], -1, False]
 ]
 venus.rising_text = [
-[0.1, 'Venüs doğuyor', '~', -1, True]
+[0.1, t['venus']+' '+t['rising'], '~', -1, True]
 ]
 mars.rising_text = [
-[0.55, 'Mars doğuyor', '~', 0, False]
+[0.55, t['mars']+' '+t['rising'], '~', 0, False]
 ]
 jupiter.rising_text = [
-[0.6, 'Jüpiter doğuyor', '~', 0, False]
+[0.6, t['jupiter']+' '+t['rising'], '~', 0, False]
 ]
 saturn.rising_text = [
-[0.14, 'Satürn doğuyor', '~', 0, False],
-[0.83, 'Satürn doğuyor', '~', 0, False]
+[0.14, t['saturn']+' '+t['rising'], '~', 0, False],
+[0.83, t['saturn']+' '+t['rising'], '~', 0, False]
 ]
 uranus.rising_text = [
-[0.6, 'Uranüs doğuyor', '~', -1, False]
+[0.6, t['uranus']+' '+t['rising'], '~', -1, False]
 ]
 neptune.rising_text = [
-[0.34, 'Neptün doğuyor', '~', 0, False]
+[0.34, t['neptune']+' '+t['rising'], '~', 0, False]
 ]
 m31.rising_text = [
-[0.24, 'M31 doğuyor', '~', 0, False]
+[0.24, 'M31 '+t['rising'], '~', 0, False]
 ]
 m45.rising_text = [
-[0.57, 'M45 doğuyor', '~', 0, False]
+[0.57, 'M45 '+t['rising'], '~', 0, False]
 ]
 m42.rising_text = [
-[0.73, 'M42 doğuyor', '~', 0, False]
+[0.73, 'M42 '+t['rising'], '~', 0, False]
 ]
 antares.rising_text = [
-[0.1, 'Antares doğuyor', '~', 0, False],
-[0.87, 'Antares doğuyor', '~', 0, False]
+[0.1, t['antares']+' '+t['rising'], '~', 0, False],
+[0.87, t['antares']+' '+t['rising'], '~', 0, False]
 ]
-
 mars.transit_text = [
-[0.925, 'Mars meridyende', '~', 0, False]
+[0.925, t['mars']+' '+t['transit'], '~', 0, False]
 ]
 jupiter.transit_text = [
-[0.7, 'Jüpiter meridyende', '~', 0, False]
+[0.7, t['jupiter']+' '+t['transit'], '~', 0, False]
 ]
 saturn.transit_text = [
-[0.25, 'Satürn meridyende', '~', 0, False]
+[0.25, t['saturn']+' '+t['transit'], '~', 0, False]
 ]
 uranus.transit_text = [
-[0.75, '~', 'Uranüs meridyende', -1, False]
+[0.75, '~', t['uranus']+' '+t['transit'], -1, False]
 ]
 neptune.transit_text = [
-[0.67, 'Neptün meridyende', '~', 0, False]
+[0.67, t['neptune']+' '+t['transit'], '~', 0, False]
 ]
 m31.transit_text = [
-[0.035, '~', 'M31 meridyende', -1, False],
-[0.77, '~', 'M31 meridyende', -1, False]
+[0.035, '~', 'M31 '+t['transit'], -1, False],
+[0.77, '~', 'M31 '+t['transit'], -1, False]
 ]
 m45.transit_text = [
-[0.08, '~', 'M45 meridyende', -1, False],
-[0.83, '~', 'M45 meridyende', -1, False]
+[0.08, '~', 'M45 '+t['transit'], -1, False],
+[0.83, '~', 'M45 '+t['transit'], -1, False]
 ]
 m42.transit_text = [
-[0.13, 'M42 meridyende', '~', 0, False],
-[0.87, 'M42 meridyende', '~', 0, False]
+[0.13, 'M42 '+t['transit'], '~', 0, False],
+[0.87, 'M42 '+t['transit'], '~', 0, False]
 ]
 antares.transit_text = [
-[0.18, 'Antares meridyende', '~', 0, False],
-[0.963, 'Antares mrd.', '~', 0, False]
+[0.18, t['antares']+' '+t['transit'], '~', 0, False],
+[0.963, t['antares']+' '+t['transit_abbrev'], '~', 0, False]
 ]
 arcturus.transit_text = [
-[0.2, 'Arcturus meridyende', '~', 0, False]
+[0.2, t['arcturus']+' '+t['transit'], '~', 0, False]
 ]
 pollux.transit_text = [
-[0.2, 'Pollux', 'meridyende', -1, False],
-[0.94, 'Pollux meridyende', '~', 0, False]
+[0.2, t['pollux'], t['transit'], -1, False],
+[0.94, t['pollux']+' '+t['transit'], '~', 0, False]
 ]
 deneb.transit_text = [
-[0.68, 'Deneb meridyende', '~', 0, False],
+[0.68, t['deneb']+' '+t['transit'], '~', 0, False],
 ]
-
 mercury.setting_text = [
-[0.25, 'Merkür', 'batıyor', -1, False],
-[0.51, 'Merkür', 'batıyor', -1, False],
-[0.89, 'Merkür', '~~batıyor', -1, False]
+[0.25, t['mercury'], t['setting'], -1, False],
+[0.51, t['mercury'], t['setting'], -1, False],
+[0.89, t['mercury'], t['setting'], -1, False]
 ]
 venus.setting_text = [
-[0.91, 'Venüs batıyor', '~', 0, True],
+[0.91, t['venus']+' '+t['setting'], '~', 0, True],
 ]
 mars.setting_text = [
-[0.07, '~', 'Mars bt.', -1, False]
+[0.07, '~', t['mars']+' '+t['set_abbrev'], -1, False]
 ]
 jupiter.setting_text = [
-[0.1, '~', 'Jüpiter batıyor', -1, False],
-[0.9, '~', 'Jüpiter batıyor', -1, False]
+[0.1, '~', t['jupiter']+' '+t['setting'], -1, False],
+[0.9, '~', t['jupiter']+' '+t['setting'], -1, False]
 ]
 saturn.setting_text = [
-[0.4, 'Satürn batıyor', '~', 0, False]
+[0.4, t['saturn']+' '+t['setting'], '~', 0, False]
 ]
 uranus.setting_text = [
-[0.13, '~', 'Uranüs batıyor', -1, False],
-[0.87, '~', 'Uranüs batıyor', -1, False]
+[0.13, '~', t['uranus']+' '+t['setting'], -1, False],
+[0.87, '~', t['uranus']+' '+t['setting'], -1, False]
 ]
 neptune.setting_text = [
-[0.09, 'Neptün batıyor', '~', 0, False],
-[0.78, 'Neptün batıyor', '~', 0, False]
+[0.09, t['neptune']+' '+t['setting'], '~', 0, False],
+[0.78, t['neptune']+' '+t['setting'], '~', 0, False]
 ]
 m31.setting_text = [
-[0.15, '~', 'M31 batıyor', -1, False],
-[0.94, '~', 'M31 batıyor', -1, False]
+[0.15, '~', 'M31 '+t['setting'], -1, False],
+[0.94, '~', 'M31 '+t['setting'], -1, False]
 ]
 m45.setting_text = [
-[0.35, '~', 'M45 batıyor', -1, False],
-[0.960, '~', 'M45 batıyor', -1, False]
+[0.35, '~', 'M45 '+t['setting'], -1, False],
+[0.960, '~', 'M45 '+t['setting'], -1, False]
 ]
 m42.setting_text = [
-[0.35, 'M42 batıyor', '~', 0, False],
-[0.965, 'M42 batıyor', '~', 0, False]
+[0.35, 'M42 '+t['setting'], '~', 0, False],
+[0.965, 'M42 '+t['setting'], '~', 0, False]
 ]
 antares.setting_text = [
-[0.45, 'Antares batıyor', '~', 0, False]
+[0.45, t['antares']+' '+t['setting'], '~', 0, False]
 ]
 
 rising_bodies  = [mercury, venus, mars, jupiter, uranus, neptune,

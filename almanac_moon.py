@@ -25,6 +25,7 @@ from pyx import path, canvas, color, style, text, graph
 from scipy import optimize
 
 from almanac_utils import *
+from translations import t
 
 mooncolorlight = color.rgb(0.6235294,0.6823529,0.827451)
 mooncolordark = color.rgb(0.3450980,0.3764706,0.458823)
@@ -96,7 +97,7 @@ def make_moon_stuff(outer_canv, inner_canv, begin_day, no_days, chart,
             fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
             # full moon
             outer_canv.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-        elif ((X < 0.55 and X > 0.45) or 
+        elif ((X < 0.55 and X > 0.45) or
               fabs(ephem.next_first_quarter_moon(mpc) - mpc) < 0.5 or
               fabs(ephem.previous_first_quarter_moon(mpc) - mpc) < 0.5) :
             # first quarter
@@ -117,7 +118,7 @@ def make_moon_stuff(outer_canv, inner_canv, begin_day, no_days, chart,
             fabs(ephem.previous_full_moon(mpc) - mpc) < 0.5) :
             # full moon
             outer_canv.stroke(path.circle(x,y,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-        elif ((X < 0.55 and X > 0.45) or 
+        elif ((X < 0.55 and X > 0.45) or
               fabs(ephem.next_last_quarter_moon(mpc) - mpc) < 0.5 or
               fabs(ephem.previous_last_quarter_moon(mpc) - mpc) < 0.5) :
             # last quarter
@@ -133,39 +134,39 @@ def make_moon_stuff(outer_canv, inner_canv, begin_day, no_days, chart,
 def make_moon_key(canv, chart) :
     x = 0.0
     y = -1.8
-    canv.fill(path.rect(x, y, chart.width, 1.0), 
+    canv.fill(path.rect(x, y, chart.width, 1.0),
             [color.rgb(0.0, 0.0, 0.0)])
     for i in range(8) :
         X = 1.0-(i+1.0)/9.0
         canv.fill(waning_moon(X, 0.08, x+(i+4.0)/4.0, -1.3),
                     [style.linejoin.bevel,mooncolorlight])
     canv.text(x+1.8, -1.1,
-              r'{\footnotesize\sffamily Küçülen Ay}',
+              r'{\footnotesize\sffamily '+t['waning']+'}',
               [text.halign.center,text.valign.baseline,mooncolorlight])
     canv.text(x+1.8, -1.7,
-              r"{\scriptsize\sffamily (Ay'ın doğuş zamanları)}",
+              r'{\scriptsize\sffamily ('+t['moonrise_times']+')}',
               [text.halign.center,text.valign.baseline,mooncolorlight])
     for i in range(8) :
         X = (i+1.0)/9.0
         canv.fill(waxing_moon(X, 0.08, x+(i+4.0)/4.0+3.0, -1.3),
                     [style.linejoin.bevel,mooncolordark])
     canv.text(x+1.8+3.0, -1.1,
-              r'{\footnotesize\sffamily Büyüyen Ay}',
+              r'{\footnotesize\sffamily '+t['waxing']+'}',
               [text.halign.center,text.valign.baseline,mooncolordark])
     canv.text(x+1.8+3.0, -1.7,
-              r"{\scriptsize\sffamily (Ay'ın batış zamanları)}",
+              r'{\scriptsize\sffamily ('+t['moonset_times']+')}',
               [text.halign.center,text.valign.baseline,mooncolordark])
     # new moon, first quarter
     # full moon,  last quarter
     canv.stroke(path.circle(x+8.5,-1.1,.12),[mooncolorlight,pyx.deco.filled([mooncolordark])])
-    canv.text(x+8.25, -1.2, r'{\footnotesize\sffamily Yeni ay}',
+    canv.text(x+8.25, -1.2, r'{\footnotesize\sffamily '+t['newmoon']+'}',
             [text.halign.right,text.valign.baseline, mooncolordark])
     canv.stroke(first_quarter_moon(0.12, x+8.9,-1.1),[mooncolordark,pyx.deco.filled([mooncolordark])])
-    canv.text(x+9.25, -1.2, r'{\footnotesize\sffamily İlk dördün}',
+    canv.text(x+9.25, -1.2, r'{\footnotesize\sffamily '+t['firstquarter']+'}',
             [text.halign.left,text.valign.baseline, mooncolordark])
     canv.stroke(path.circle(x+8.5,-1.5,.12),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-    canv.text(x+8.25, -1.6, r'{\footnotesize\sffamily Dolunay}',
+    canv.text(x+8.25, -1.6, r'{\footnotesize\sffamily '+t['fullmoon']+'}',
             [text.halign.right,text.valign.baseline, mooncolorlight])
     canv.stroke(last_quarter_moon(0.12, x+8.9,-1.5),[mooncolorlight,pyx.deco.filled([mooncolorlight])])
-    canv.text(x+9.25, -1.6, r'{\footnotesize\sffamily Son dördün}',
+    canv.text(x+9.25, -1.6, r'{\footnotesize\sffamily '+t['lastquarter']+'}',
             [text.halign.left,text.valign.baseline, mooncolorlight])
