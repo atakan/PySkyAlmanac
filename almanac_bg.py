@@ -67,8 +67,8 @@ def make_alm_bg(bclc, begin_day_datetime, no_days, chart, obs,
 #    # XXX w/o the little addition of 0.2*ephem.hour below, we would have
 #    # XXX small empty triangular regions.
 #    SS = to_chart_coord(sun_set[doy]-0.2*ephem.hour, chart)
-#    ET = to_chart_coord(eve_twilight[doy], chart) 
-#    MT = to_chart_coord(mor_twilight[doy], chart) 
+#    ET = to_chart_coord(eve_twilight[doy], chart)
+#    MT = to_chart_coord(mor_twilight[doy], chart)
 #    SR = to_chart_coord(sun_rise[doy]+0.2*ephem.hour, chart)
 ## evening twilight to darkness
 #    LLx = SS[0]
@@ -121,7 +121,7 @@ def make_alm_bg(bclc, begin_day_datetime, no_days, chart, obs,
     bclc.insert(g)
     # the following is for the debugging the graph above
     #c.stroke(path.line(0, 0, chart.width, chart.height), [color.cmyk.Red])
-    
+
 def make_alm_bg_vdots(bclc, first_sunday, no_days, chart) :
     # vertical dots
     # left side is 4pm, right side is 8am. We will draw dots every 1/2 hour
@@ -132,7 +132,7 @@ def make_alm_bg_vdots(bclc, first_sunday, no_days, chart) :
         bclc.stroke(path.line(i*xincr, 0, i*xincr, h),
                 [color.cmyk.Gray, style.linestyle(style.linecap.round,
                     style.dash([0, 2.6333*366.0/no_days]))])
-    
+
 def make_alm_bg_hdots(bclc, first_sunday, no_days, chart) :
     # horizontal dots
     # we start with the first Sunday of the year
