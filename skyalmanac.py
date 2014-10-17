@@ -27,7 +27,7 @@ from pyx import path, canvas, color, style, text, graph
 from almanac_bg import *
 from almanac_moon import *
 from almanac_utils import *
-from local_info import obs, obsTZ, utcTZ, year
+from local_info import obs, obsTZ, utcTZ, year, earliest_sunset, latest_sunrise
 from local_info import begin_day, begin_day_datetime, no_days
 from local_info import first_sunday, first_sunday_datetime
 from local_info import rising_bodies, transit_bodies, setting_bodies
@@ -46,9 +46,8 @@ for m in range(13):
 class Chart() :
     pass
 chart = Chart()
-# Can calculate sunrise/set and twilight http://rhodesmill.org/pyephem/rise-set.html
-chart.ULcorn = ephem.date(begin_day+4*ephem.hour) # at 4pm (in Ankara Sun does not set earlier than 4pm)
-chart.URcorn = ephem.date(chart.ULcorn+16*ephem.hour) # 8 am next day (in Ankara Sun does not rise later than 8am)
+chart.ULcorn = ephem.date(begin_day+(earliest_sunset * ephem.hour))
+chart.URcorn = ephem.date(chart.ULcorn+((12-earliest_sunset+latest_sunrise) * ephem.hour))
 chart.LLcorn = ephem.date(chart.ULcorn+no_days)
 chart.LRcorn = ephem.date(chart.URcorn+no_days)
 chart.width = 22.0
@@ -63,7 +62,7 @@ mor_twilight = []
 obs.horizon = '-18' # Astronomical twilight uses -18deg, Nautical twilight uses -12deg, and Civil twilight uses -6deg.
 for doy in range(no_days) :
     obs.date = begin_day + doy
-    # The above twilight def. specifies position of center of Sun, so to make use center of sun set `use_center`.
+    # The twilight def. specifies position of center of Sun, so to make use center of sun set `use_center`.
     eve_twilight.append(obs.next_setting(sun, use_center=True))
     mor_twilight.append(obs.next_rising(sun, use_center=True))
 obs.horizon = '0'
@@ -71,6 +70,7 @@ obs.horizon = '0'
 # Normal Sunrise and Sunset
 sun_rise = []
 sun_set = []
+# TODO: compare calculated earliest sunset and latest sunrise to the min/max of these lists
 for doy in range(no_days) :
     obs.date = begin_day + doy
     sun_set.append(obs.next_setting(sun))

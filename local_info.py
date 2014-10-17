@@ -75,6 +75,38 @@ for first_sunday in range(1,8) :
         break
 first_sunday_datetime = datetime.datetime(year, 1, first_sunday, 12, tzinfo=obsTZ)
 
+# Can calculate sunrise/set and twilight http://rhodesmill.org/pyephem/rise-set.html
+# According to Naval Astronomical Almanac, set horizon to 34 arcminutes lower than normal horizon, and pressure to zero.
+# In addition to this, we want the latest sunrise, and the earliest sunset. We
+# can't directly use the solstice though, but the order is the same always;
+# earliest sunset, winter solstice, then latest sunrise.
+# References:
+# http://earthsky.org/tonight/latest-sunrises-for-midnorthern-latitudes-in-early-january
+# http://aa.usno.navy.mil/faq/docs/rs_solstices.php
+temp_pressure = obs.pressure # Stash observer pressure and horizon
+temp_horizon = obs.horizon # Just in case set other than zero for an experimental observer
+obs.pressure = 0
+obs.horizon = '-0:34' # 34 arcminutes lower than normal horizon
+# We know that the date of the solstice doesn't give us the dates we want, but
+# for now, I will round up/down for that date until can calculate more accurately.
+# Will be okay for people next to the equator and less accurate the closer you get to the arctic/antarctic circles.
+solstice_date = ephem.date(ephem.next_solstice(obs_date) - 8./24) # TODO: rectify for locale (solstice_date/obs_sunrise/obs_sunset)
+if(solstice_date.triple()[0]>obs_date.year): # make a check for running this code after the solstice
+    solstice_date = ephem.date(ephem.previous_solstice(obs_date) - 8./24)
+# Calculate Latest Sunrise
+obs_sunrise = ephem.date(obs.previous_rising(ephem.Sun(), solstice_date) - 8./24)
+# Calculate Earliest Sunset
+obs_sunset = ephem.date(obs.next_setting(ephem.Sun(), solstice_date) - 8./24)
+print('earliest sunset: {}'.format(obs_sunset))
+print('solstice: {}'.format(solstice_date))
+print('latest sunrise: {}'.format(obs_sunrise))
+# Put values back
+obs.pressure = temp_pressure
+obs.horizon = temp_horizon
+earliest_sunset = obs_sunset.tuple()[3] - 12 #(PM)
+latest_sunrise = obs_sunrise.tuple()[3] + 1 #(AM), add one to round up
+print('{}PM to {}AM will be the bounds of the chart'.format(earliest_sunset,latest_sunrise))
+
 ## In Turkey (and in most of Europe), DST rules are:
 ## Start: Last Sunday in March
 ## End: Last Sunday in October
