@@ -30,21 +30,28 @@ from translations import t
 # and make arrangements for the twilight lines.
 
 manually_set = False
+use_today = True
+manually_set_timezone = False
 if(manually_set):
     obs = ephem.Observer()
-    obs.lat  = '39.877'
-    obs.long = '32.807'
+    # Fernandina Beach, Florida
+    # References:
+    # https://tools.wmflabs.org/geohack/geohack.php?pagename=Fernandina_Beach%2C_Florida&params=30_40_10_N_81_27_42_W_type:city(11487)_region:US-FL
+    # https://en.wikipedia.org/wiki/Fernandina_Beach,_Florida
+    obs.lat  = '30.669444'
+    obs.long = '-81.461667'
+    obs.elevation = 7.6 # meters
 else:
     obs_city = 'San Francisco' #See which cities are valid at https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py
     obs = ephem.city(obs_city)
 
-if(manually_set):
-    obs_date = datetime.date(1988,3,4) #set specific date
-else:
+if(use_today):
     obs_date = datetime.date.today()
     #obs_date = datetime.datetime.now()
+else:
+    obs_date = datetime.date(1988,3,4) #set specific date
 
-if(manually_set):
+if(manually_set_timezone):
     #obsTZ = pytz.timezone('Europe/Istanbul')
     #obsTZ = pytz.timezone('US/Pacific')
     obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal time, +3 summer time
