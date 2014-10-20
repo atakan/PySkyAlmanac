@@ -34,13 +34,12 @@ use_today = True
 manually_set_timezone = False
 if(manually_set):
     obs = ephem.Observer()
-    # Fernandina Beach, Florida
-    # References:
-    # https://tools.wmflabs.org/geohack/geohack.php?pagename=Fernandina_Beach%2C_Florida&params=30_40_10_N_81_27_42_W_type:city(11487)_region:US-FL
-    # https://en.wikipedia.org/wiki/Fernandina_Beach,_Florida
     obs.lat  = '30.669444'
     obs.long = '-81.461667'
-    obs.elevation = 7.6 # meters
+    obs.elevation = 7.6
+    #obs.temp = 15.0
+    #obs.pressure = 1010.0
+    #obs.epoch = 2000
 else:
     obs_city = 'San Francisco' #See which cities are valid at https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py
     obs = ephem.city(obs_city)
@@ -85,7 +84,7 @@ first_sunday_datetime = datetime.datetime(year, 1, first_sunday, 12, tzinfo=obsT
 # Can calculate sunrise/set and twilight http://rhodesmill.org/pyephem/rise-set.html
 # According to Naval Astronomical Almanac, set horizon to 34 arcminutes lower than normal horizon, and pressure to zero.
 # In addition to this, we want the latest sunrise, and the earliest sunset. We
-# can't directly use the solstice though, but the order is the same always;
+# can't directly use the solstice though, but the order is always the same;
 # earliest sunset, winter solstice, then latest sunrise.
 # References:
 # http://earthsky.org/tonight/latest-sunrises-for-midnorthern-latitudes-in-early-january
@@ -100,10 +99,10 @@ obs.horizon = '-0:34' # 34 arcminutes lower than normal horizon
 solstice_date = ephem.date(ephem.next_solstice(obs_date) - 8./24) # TODO: rectify for locale (solstice_date/obs_sunrise/obs_sunset)
 if(solstice_date.triple()[0]>obs_date.year): # make a check for running this code after the solstice
     solstice_date = ephem.date(ephem.previous_solstice(obs_date) - 8./24)
-# Calculate Latest Sunrise
-obs_sunrise = ephem.date(obs.previous_rising(ephem.Sun(), solstice_date) - 8./24)
 # Calculate Earliest Sunset
-obs_sunset = ephem.date(obs.next_setting(ephem.Sun(), solstice_date) - 8./24)
+obs_sunset = ephem.date(obs.previous_setting(ephem.Sun(), solstice_date) - 8./24)
+# Calculate Latest Sunrise
+obs_sunrise = ephem.date(obs.next_rising(ephem.Sun(), solstice_date) - 8./24)
 print('earliest sunset: {}'.format(obs_sunset))
 print('solstice: {}'.format(solstice_date))
 print('latest sunrise: {}'.format(obs_sunrise))
@@ -111,7 +110,7 @@ print('latest sunrise: {}'.format(obs_sunrise))
 obs.pressure = temp_pressure
 obs.horizon = temp_horizon
 earliest_sunset = obs_sunset.tuple()[3] - 12 #(PM)
-latest_sunrise = obs_sunrise.tuple()[3] + 1 #(AM), add one to round up
+latest_sunrise = obs_sunrise.tuple()[3] + 1 #(AM), add one to round to end of hour
 print('{}PM to {}AM will be the bounds of the chart'.format(earliest_sunset,latest_sunrise))
 
 ## In Turkey (and in most of Europe), DST rules are:
@@ -219,6 +218,10 @@ m42.transit_text = [
 [0.13, 'M42 '+t['transits'], '~', 0, False],
 [0.87, 'M42 '+t['transits'], '~', 0, False]
 ]
+# m57.transit_text = [
+# [0.13, 'M57 '+t['transits'], '~', 0, False],
+# [0.87, 'M57 '+t['transits'], '~', 0, False]
+# ]
 antares.transit_text = [
 [0.18, t['antares']+' '+t['transits'], '~', 0, False],
 [0.963, t['antares']+' '+t['transits_abbrev'], '~', 0, False]

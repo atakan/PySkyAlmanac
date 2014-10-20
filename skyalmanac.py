@@ -34,7 +34,7 @@ from local_info import rising_bodies, transit_bodies, setting_bodies
 from translations import t
 
 display_moon_stuff = True
-display_bg = False
+display_bg = True
 
 locale.setlocale(locale.LC_ALL,'')
 mnt_names = []
@@ -100,13 +100,11 @@ c = canvas.canvas()
 # prepare the limits of the chart and a clippath
 ulx, uly = to_chart_coord(sun_set[0], chart)
 urx, ury = to_chart_coord(sun_rise[0], chart)
-top_line = path.path(path.moveto(ulx, uly),
-                     path.lineto(urx, ury))
+top_line = path.path(path.moveto(ulx, uly), path.lineto(urx, ury))
 
 llx, lly = to_chart_coord(sun_set[-1], chart)
 lrx, lry = to_chart_coord(sun_rise[-1], chart)
-bot_line = path.path(path.moveto(llx, lly),
-                     path.lineto(lrx, lry))
+bot_line = path.path(path.moveto(llx, lly), path.lineto(lrx, lry))
 
 rev_sun_set = sun_set[:]
 rev_sun_set.reverse()
@@ -118,7 +116,7 @@ bclc = canvas.canvas([canvas.clip(clippath)]) # clipped canvas for the backgroun
 
 # a seperate (larger) clipping canvas for Moon phases
 clippath2 = event_to_path([rev_sun_set[0]+2.0] +
-        rev_sun_set[:] + [rev_sun_set[-1]-2.0], chart, do_check=False,
+            rev_sun_set[:] + [rev_sun_set[-1]-2.0], chart, do_check=False,
             xoffset=-1.6)
 clippath2 = clippath2.joined(event_to_path([sun_rise[0]-2.0] +
             sun_rise[:] + [sun_rise[-1]+2.0], chart, do_check=False,
@@ -287,25 +285,24 @@ def body_path_calibrator(canv, bd) :
 
 # hour labels (from 5pm to 7am)
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
-#for i, tlab in enumerate(['17:00', '18:00', '19:00', '20:00',
-#          '21:00', '22:00', '23:00', r'geceyarısı',
-#          '01:00', '02:00', '03:00', '04:00',
-#          '05:00', '06:00', '07:00']) :
+#TODO: not hard-coded times
 for i, tlab in enumerate(['17', '18', '19', '20',
           '21', '22', '23', t['midnight'],
           '01', '02', '03', '04',
           '05', '06', '07']) :
-    x = (i+1)*xincr
+    x = (i+1+1)*xincr #TODO: calculate shift, originally just +1
     y1 = -0.25
     y2 = chart.height+0.15
     c.text(x, y1, tlab, [text.halign.center, text.valign.baseline])
     c.text(x, y2, tlab, [text.halign.center, text.valign.baseline])
-x = chart.width*3.0/12.0
+#x = chart.width*3.0/12.0
+x = ulx+(urx+ulx)/8.0 # a quarter of the length along top
 y1 = -0.75
 y2 = chart.height+0.65
 #c.text(x, y1, t['evening'], [text.halign.center, text.valign.baseline])
 c.text(x, y2, t['evening'], [text.halign.center, text.valign.baseline])
-x = chart.width*9.0/12.0
+#x = chart.width*9.0/12.0
+x = urx-(urx+ulx)/8.0 # three-quarters along the top
 #c.text(x, y1, t['morning'], [text.halign.center, text.valign.baseline])
 c.text(x, y2, t['morning'], [text.halign.center, text.valign.baseline])
 
@@ -369,17 +366,17 @@ c.stroke(bot_line)
 c.stroke(event_to_path(sun_set, chart))
 c.stroke(event_to_path(sun_rise, chart))
 
-make_moon_key(c, chart)
-c.text(12., -1.1,
+make_moon_key(c, chart, llx, lrx)
+#TODO: Room for more text in footer, 15.5 and 18.0 seem good positions from the left of the footer when footer starts at x=0.0.
+c.text(llx+12., -1.1,
               r'{\footnotesize\sffamily M31: '+t['andromeda']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
-c.text(12., -1.4,
+c.text(llx+12., -1.4,
               r'{\footnotesize\sffamily M42: '+t['orion']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
-c.text(12., -1.7,
+c.text(llx+12., -1.7,
               r'{\footnotesize\sffamily M45: '+t['sevensisters']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
-
 c.text(0.0, chart.height/2.0,
        r'{\tiny{\sffamily PySkyAlmanac:} {\ttfamily https://github.com/atakan/PySkyAlmanac}}',
        [

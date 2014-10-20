@@ -1,38 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#Turkish
-tr = {
-    'midnight':'geceyarısı',
-    'evening':'AKŞAM',
-    'morning':'SABAH',
-    'andromeda':'Andromeda Gökadası',
-    'orion':'Avcı Bulutsusu',
-    'sevensisters':'Yedi Kızkardeşler',
-    'waning':'Küçülen Ay',
-    'moonrise_times':'Ay\'ın doğuş zamanları',
-    'waxing':'Büyüyen Ay',
-    'moonset_times':'Ay\'ın batış zamanları',
-    'newmoon':'Yeni ay',
-    'firstquarter':'İlk dördün',
-    'fullmoon':'Dolunay',
-    'lastquarter':'Son dördün',
-    'rises':'doğuyor',
-    'mercury':'Merkür',
-    'venus':'Venüs',
-    'mars':'Mars',
-    'jupiter':'Jüpiter',
-    'saturn':'Satürn',
-    'uranus':'Uranüs',
-    'neptune':'Neptün',
-    'antares':'Antares',
-    'transits':'meridyende',
-    'transits_abbrev':'mrd.',
-    'arcturus':'Arcturus',
-    'pollux':'Pollux',
-    'deneb':'Deneb',
-    'sets':'batıyor',
-    'sets_abbrev':'bt.',
-}
 #English
 en = {
     'midnight':'Midnight',
@@ -65,6 +32,41 @@ en = {
     'deneb':'Deneb',
     'sets':'Sets',
     'sets_abbrev':'Sts.',
+    'ring_nebula':'Ring Nebula',
+}
+#Turkish
+tr = {
+    'midnight':'geceyarısı',
+    'evening':'AKŞAM',
+    'morning':'SABAH',
+    'andromeda':'Andromeda Gökadası',
+    'orion':'Avcı Bulutsusu',
+    'sevensisters':'Yedi Kızkardeşler',
+    'waning':'Küçülen Ay',
+    'moonrise_times':'Ay\'ın doğuş zamanları',
+    'waxing':'Büyüyen Ay',
+    'moonset_times':'Ay\'ın batış zamanları',
+    'newmoon':'Yeni ay',
+    'firstquarter':'İlk dördün',
+    'fullmoon':'Dolunay',
+    'lastquarter':'Son dördün',
+    'rises':'doğuyor',
+    'mercury':'Merkür',
+    'venus':'Venüs',
+    'mars':'Mars',
+    'jupiter':'Jüpiter',
+    'saturn':'Satürn',
+    'uranus':'Uranüs',
+    'neptune':'Neptün',
+    'antares':'Antares',
+    'transits':'meridyende',
+    'transits_abbrev':'mrd.',
+    'arcturus':'Arcturus',
+    'pollux':'Pollux',
+    'deneb':'Deneb',
+    'sets':'batıyor',
+    'sets_abbrev':'bt.',
+    'ring_nebula':en['ring_nebula'],
 }
 #Chinese
 ch = {
@@ -98,6 +100,7 @@ ch = {
   'deneb':'天津四',
   'sets':'套',
   'sets_abbrev':'套',
+  'ring_nebula':en['ring_nebula'],
 }
 #German
 de = {

@@ -16,7 +16,7 @@ Atakan Gürkan <ato.gurkan@gmail.com>
 ##Instructions
 See `local_info.py` to see options for setting your location. There is minimal setup; you only have to change the `obs_city` field. That is, `obs_city = 'San Francisco'` or `Istanbul`.
 
-It is of course possible your city isn't [listed](https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py), so in that case switch the `manually_set` flag to `True` and fill in your latitude, longitude, year, and timezone at minimum. See [this quick reference](http://rhodesmill.org/pyephem/quick.html#observers) on setting up your observer. Elevation (m) or pressure (mBar) are optional. Leaving atmospheric pressure as zero ignores refraction. If you want a year before 2000, you'll have to change `epoch`.
+It is of course possible your city isn't [listed](https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py), so in that case switch the `manually_set` flag to `True` and fill in your latitude, longitude, year, and timezone at minimum. See [this quick reference](http://rhodesmill.org/pyephem/quick.html#observers) on setting up your observer. `elevation` (m) is optional. Can also set `epoch`, `temp` and `pressure` if desired.
 
 Turkish, English and Chinese languages are supported. In `translations.py` change `t=tr` to either `en` or `ch`.
 

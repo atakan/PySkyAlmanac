@@ -131,15 +131,16 @@ def make_moon_stuff(outer_canv, inner_canv, begin_day, no_days, chart,
             inner_canv.fill(waning_moon(X, 0.08, x, y),
                     [style.linejoin.bevel,mooncolorlight])
 
-def make_moon_key(canv, chart) :
-    x = 0.0
+def make_moon_key(canv, chart, left_bound, right_bound):
+    # TODO: shift chart to match this, or shift this to match chart?
+    #x = 0.0
+    x = left_bound
     y = -1.8
-    canv.fill(path.rect(x, y, chart.width, 1.0),
-            [color.rgb(0.0, 0.0, 0.0)])
-    for i in range(8) :
+    #canv.fill(path.rect(x, y, chart.width, 1.0), [color.rgb(0.0, 0.0, 0.0)])
+    canv.fill(path.rect(x, y, right_bound-left_bound, 1.0), [color.rgb(0.0, 0.0, 0.0)])
+    for i in range(8):
         X = 1.0-(i+1.0)/9.0
-        canv.fill(waning_moon(X, 0.08, x+(i+4.0)/4.0, -1.3),
-                    [style.linejoin.bevel,mooncolorlight])
+        canv.fill(waning_moon(X, 0.08, x+(i+4.0)/4.0, -1.3), [style.linejoin.bevel,mooncolorlight])
     canv.text(x+1.8, -1.1,
               r'{\footnotesize\sffamily '+t['waning']+'}',
               [text.halign.center,text.valign.baseline,mooncolorlight])
