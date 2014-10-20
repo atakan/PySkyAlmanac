@@ -33,6 +33,7 @@ from local_info import first_sunday, first_sunday_datetime
 from local_info import rising_bodies, transit_bodies, setting_bodies
 from translations import t
 
+equation_of_time = False
 display_moon_stuff = True
 display_bg = True
 
@@ -69,12 +70,15 @@ obs.horizon = '0'
 
 # Normal Sunrise and Sunset
 sun_rise = []
+solar_noon = []
 sun_set = []
 # TODO: compare calculated earliest sunset and latest sunrise to the min/max of these lists
 for doy in range(no_days) :
     obs.date = begin_day + doy
-    sun_set.append(obs.next_setting(sun))
     sun_rise.append(obs.next_rising(sun))
+    #TODO: This is using solar noon shifted twelve hours onto midnight to see if the sun is running fast or slow.
+    solar_noon.append(ephem.Date(obs.next_transit(sun) - 12.*ephem.hour))
+    sun_set.append(obs.next_setting(sun))
 
 # XXX the +8, -8 bug fix below is a mystery to me,
 # XXX but it seems necessary. this probably points out to a deeper
@@ -134,6 +138,10 @@ clc.stroke(event_to_path(eve_twilight, chart),
            [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
 clc.stroke(event_to_path(mor_twilight, chart),
            [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
+
+# Solar noon line
+if(equation_of_time):
+    clc.stroke(event_to_path(solar_noon, chart), [color.cmyk.White, style.linewidth.Thin])
 
 def add_text_to_path(canv, chart, ev, pos,
         offset=0, sep=1.1, rotate=False, txt1='~', txt2='~',

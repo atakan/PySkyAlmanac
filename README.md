@@ -4,9 +4,7 @@ The code is written in [Python](http://www.python.org/). It uses [PyX](http://py
 
 This is in development stage and certainly has bugs. [...] I tried to make it easy to adapt to different locations and years; in particular, the comments and the function names are in English. If you plan to port it to a different locale (location, timeframe, language etc.) please let me know. I would be more than happy to help out.
 
-Keywords: Sky almanac -- celestial events
-
-Atakan Gürkan <ato.gurkan@gmail.com>
+Keywords: Sky almanac, celestial events, astronomy
 
 ##Install Dependencies
 * PyEphem - `pip install pyephem`
@@ -18,9 +16,13 @@ See `local_info.py` to see options for setting your location. There is minimal s
 
 It is of course possible your city isn't [listed](https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py), so in that case switch the `manually_set` flag to `True` and fill in your latitude, longitude, year, and timezone at minimum. See [this quick reference](http://rhodesmill.org/pyephem/quick.html#observers) on setting up your observer. `elevation` (m) is optional. Can also set `epoch`, `temp` and `pressure` if desired.
 
-Turkish, English and Chinese languages are supported. In `translations.py` change `t=tr` to either `en` or `ch`.
+Turkish, English and Chinese languages are supported. In `translations.py` change `t=en` to either `tr` or `ch`.
 
-Set `display_moon_stuff = True` or `False` for moon stuff.
+```
+equation_of_time = True   #plot equation of time
+display_moon_stuff = True #for moon stuff
+display_bg = True         #display night gradient
+```
 
 #License
 You can copy, modify and distribute the code under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html). See the file COPYING for more details. You can also freely distribute the end product, the chart itself. If you want to give a reference to the tool creating the chart, you can use the URL https://github.com/atakan/PySkyAlmanac
