@@ -35,7 +35,7 @@ from translations import t
 
 equation_of_time = False
 display_moon_stuff = True
-display_bg = True
+display_bg = False
 
 locale.setlocale(locale.LC_ALL,'')
 mnt_names = []
@@ -134,18 +134,14 @@ make_alm_bg_vdots(bclc, first_sunday, no_days, chart)
 make_alm_bg_hdots(bclc, first_sunday, no_days, chart)
 
 # Twilight lines
-clc.stroke(event_to_path(eve_twilight, chart),
-           [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
-clc.stroke(event_to_path(mor_twilight, chart),
-           [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
+clc.stroke(event_to_path(eve_twilight, chart), [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
+clc.stroke(event_to_path(mor_twilight, chart), [color.cmyk.Gray, style.linewidth.Thin, style.linestyle.dashed])
 
 # Solar noon line
 if(equation_of_time):
     clc.stroke(event_to_path(solar_noon, chart), [color.cmyk.White, style.linewidth.Thin])
 
-def add_text_to_path(canv, chart, ev, pos,
-        offset=0, sep=1.1, rotate=False, txt1='~', txt2='~',
-        txt_color=color.cmyk.Gray, txt_size='small') :
+def add_text_to_path(canv, chart, ev, pos, offset=0, sep=1.1, rotate=False, txt1='~', txt2='~', txt_color=color.cmyk.Gray, txt_size='small') :
     '''Adding text to a given event path.
        ev: event list that forms the path
        pos: a number 0<=x<=1 determining the position of the text along
@@ -293,12 +289,15 @@ def body_path_calibrator(canv, bd) :
 
 # hour labels (from 5pm to 7am)
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
-#TODO: not hard-coded times
-for i, tlab in enumerate(['17', '18', '19', '20',
-          '21', '22', '23', t['midnight'],
-          '01', '02', '03', '04',
-          '05', '06', '07']) :
-    x = (i+1+1)*xincr #TODO: calculate shift, originally just +1
+times = []
+start_time = 17 # TODO: not hard-coded start time
+for i in range(15):
+    if(i+start_time == 24):
+        times.append(t['midnight'])
+    else:
+        times.append('{:02d}'.format((i+start_time)%24))
+for i, tlab in enumerate(times):
+    x = (i+1+1)*xincr # TODO: calculate shift, originally just +1
     y1 = -0.25
     y2 = chart.height+0.15
     c.text(x, y1, tlab, [text.halign.center, text.valign.baseline])
@@ -375,7 +374,7 @@ c.stroke(event_to_path(sun_set, chart))
 c.stroke(event_to_path(sun_rise, chart))
 
 make_moon_key(c, chart, llx, lrx)
-#TODO: Room for more text in footer, 15.5 and 18.0 seem good positions from the left of the footer when footer starts at x=0.0.
+# TODO: Room for more text in footer, 15.5 and 18.0 seem good positions from the left of the footer when footer starts at x=0.0.
 c.text(llx+12., -1.1,
               r'{\footnotesize\sffamily M31: '+t['andromeda']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
@@ -385,12 +384,23 @@ c.text(llx+12., -1.4,
 c.text(llx+12., -1.7,
               r'{\footnotesize\sffamily M45: '+t['sevensisters']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
-c.text(0.0, chart.height/2.0,
-       r'{\tiny{\sffamily PySkyAlmanac:} {\ttfamily https://github.com/atakan/PySkyAlmanac}}',
-       [
-        text.halign.center,text.valign.bottom,
-        pyx.trafo.rotate(90),
-        color.cmyk.Black])
+# c.text(llx+15.5, -1.1,
+#               r'{\footnotesize\sffamily M01: '+t['crab_nebula']+'}',
+#               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
+# c.text(llx+15.5, -1.4,
+#               r'{\footnotesize\sffamily M57: '+t['ring_nebula']+'}',
+#               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
+# c.text(llx+15.5, -1.7,
+#               r'{\footnotesize\sffamily M97: '+t['owl_nebula']+'}',
+#               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
+
+try:
+    import subprocess
+    repo_url = subprocess.check_output(['git','config','remote.origin.url']).replace('.git','')
+except:
+    repo_url = 'https://github.com/atakan/PySkyAlmanac'
+c.text(0.0, chart.height/2.0, r'{\tiny{\sffamily PySkyAlmanac:} {\ttfamily '+repo_url+'}}',
+       [text.halign.center,text.valign.bottom, pyx.trafo.rotate(90), color.cmyk.Black])
 
 try:
     from local_info import obs_city
