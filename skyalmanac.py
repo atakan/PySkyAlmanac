@@ -35,7 +35,7 @@ from translations import t
 
 equation_of_time = False
 display_moon_stuff = True
-display_bg = False
+display_bg = True
 
 locale.setlocale(locale.LC_ALL,'')
 mnt_names = []
@@ -290,26 +290,28 @@ def body_path_calibrator(canv, bd) :
 # hour labels (from 5pm to 7am)
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
 times = []
-start_time = 17 # TODO: not hard-coded start time
-for i in range(15):
+#start_time = 17
+start_time = ephem.Date(sun_set[0] - 8.*ephem.hour).tuple()[3] # TODO: not hardcoded to this timezone
+#end_time = 7
+end_time = ephem.Date(sun_rise[0] - 8.*ephem.hour).tuple()[3] # TODO: not hardcoded to this timezone
+for i in range(24-start_time+end_time+1):
     if(i+start_time == 24):
         times.append(t['midnight'])
     else:
         times.append('{:02d}'.format((i+start_time)%24))
 for i, tlab in enumerate(times):
-    x = (i+1+1)*xincr # TODO: calculate shift, originally just +1
+    x = ulx+i*xincr # TODO: verify times are correctly placed over vertical lines
     y1 = -0.25
     y2 = chart.height+0.15
     c.text(x, y1, tlab, [text.halign.center, text.valign.baseline])
     c.text(x, y2, tlab, [text.halign.center, text.valign.baseline])
-#x = chart.width*3.0/12.0
-x = ulx+(urx+ulx)/8.0 # a quarter of the length along top
+x = ulx+(urx+ulx)/8.0
 y1 = -0.75
 y2 = chart.height+0.65
 #c.text(x, y1, t['evening'], [text.halign.center, text.valign.baseline])
 c.text(x, y2, t['evening'], [text.halign.center, text.valign.baseline])
 #x = chart.width*9.0/12.0
-x = urx-(urx+ulx)/8.0 # three-quarters along the top
+x = urx-(urx+ulx)/8.0
 #c.text(x, y1, t['morning'], [text.halign.center, text.valign.baseline])
 c.text(x, y2, t['morning'], [text.halign.center, text.valign.baseline])
 
@@ -374,7 +376,6 @@ c.stroke(event_to_path(sun_set, chart))
 c.stroke(event_to_path(sun_rise, chart))
 
 make_moon_key(c, chart, llx, lrx)
-# TODO: Room for more text in footer, 15.5 and 18.0 seem good positions from the left of the footer when footer starts at x=0.0.
 c.text(llx+12., -1.1,
               r'{\footnotesize\sffamily M31: '+t['andromeda']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
@@ -384,13 +385,13 @@ c.text(llx+12., -1.4,
 c.text(llx+12., -1.7,
               r'{\footnotesize\sffamily M45: '+t['sevensisters']+'}',
               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
-# c.text(llx+15.5, -1.1,
+# c.text(llx+16., -1.1,
 #               r'{\footnotesize\sffamily M01: '+t['crab_nebula']+'}',
 #               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
-# c.text(llx+15.5, -1.4,
+# c.text(llx+16., -1.4,
 #               r'{\footnotesize\sffamily M57: '+t['ring_nebula']+'}',
 #               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
-# c.text(llx+15.5, -1.7,
+# c.text(llx+16., -1.7,
 #               r'{\footnotesize\sffamily M97: '+t['owl_nebula']+'}',
 #               [text.halign.left,text.valign.baseline,color.cmyk.Gray])
 

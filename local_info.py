@@ -39,7 +39,6 @@ if(manually_set):
     obs.elevation = 7.6
     #obs.temp = 15.0
     #obs.pressure = 1010.0
-    #obs.epoch = 2000
 else:
     obs_city = 'San Francisco' #See which cities are valid at https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py
     obs = ephem.city(obs_city)
@@ -137,14 +136,13 @@ saturn =  PyEph_body(ephem.Saturn(), color.cmyk.Yellow)
 uranus =  PyEph_body(ephem.Uranus(), color.cmyk.SpringGreen)
 neptune = PyEph_body(ephem.Neptune(), color.cmyk.ForestGreen)
 # some messier objects
-m13 = PyEph_body(ephem.readdb("M13,f|C,16:41:42,36:28,5.9,2000,996"),
-        symbol='m13', tsize='tiny')
-m31 = PyEph_body(ephem.readdb("M31,f|G,0:42:44,+41:16:8,4.16,2000,11433|3700|35"),
-        symbol='m31', tsize='tiny')
-m42 = PyEph_body(ephem.readdb("M42,f|U,05:35:18,-05:23,4,2000,3960"),
-        symbol='m42', tsize='tiny')
-m45 = PyEph_body(ephem.readdb("M45,f|U,03:47:0,24:07,1.2,2000,6000"),
-        symbol='m45', tsize='tiny')
+m1 = PyEph_body(ephem.readdb("M1,f|R,05:34:30,22:01,8.4,2000,360"), symbol='m1', tsize='tiny')
+m13 = PyEph_body(ephem.readdb("M13,f|C,16:41:42,36:28,5.9,2000,996"), symbol='m13', tsize='tiny')
+m31 = PyEph_body(ephem.readdb("M31,f|G,0:42:44,+41:16:8,4.16,2000,11433|3700|35"), symbol='m31', tsize='tiny')
+m42 = PyEph_body(ephem.readdb("M42,f|U,05:35:18,-05:23,4,2000,3960"), symbol='m42', tsize='tiny')
+m45 = PyEph_body(ephem.readdb("M45,f|U,03:47:0,24:07,1.2,2000,6000"), symbol='m45', tsize='tiny')
+m57 = PyEph_body(ephem.readdb("M57,f|P,18:53:36,33:02,9,2000,86"), symbol='m57', tsize='tiny')
+m97 = PyEph_body(ephem.readdb("M97,f|P,11:14:48,55:01,11,2000,202"), symbol='m97', tsize='tiny')
 # some bright stars
 sirius     = PyEph_body(ephem.star('Sirius'), symbol='Sir', tsize='tiny')
 antares    = PyEph_body(ephem.star('Regulus'), symbol='Ant', tsize='tiny')
@@ -218,10 +216,10 @@ m42.transit_text = [
 [0.13, 'M42 '+t['transits'], '~', 0, False],
 [0.87, 'M42 '+t['transits'], '~', 0, False]
 ]
-# m57.transit_text = [
-# [0.13, 'M57 '+t['transits'], '~', 0, False],
-# [0.87, 'M57 '+t['transits'], '~', 0, False]
-# ]
+m57.transit_text = [
+[0.13, 'M57 '+t['transits'], '~', 0, False],
+[0.87, 'M57 '+t['transits'], '~', 0, False]
+]
 antares.transit_text = [
 [0.18, t['antares']+' '+t['transits'], '~', 0, False],
 [0.963, t['antares']+' '+t['transits_abbrev'], '~', 0, False]
@@ -279,13 +277,13 @@ antares.setting_text = [
 ]
 
 rising_bodies  = [mercury, venus, mars, jupiter, uranus, neptune,
-                  m31, m42, m45,
+                  m31, m42, m45, m57,
                   sirius, antares, deneb, betelgeuse, pollux]
 setting_bodies = [mercury, venus, mars, jupiter, uranus, neptune,
-                  m31, m42, m45,
+                  m31, m42, m45, m57,
                   sirius, antares, deneb, betelgeuse, pollux]
 transit_bodies = [mars, jupiter, uranus, neptune,
-                  m31, m42, m45,
+                  m31, m42, m45, m57,
                   sirius, antares, deneb, betelgeuse, pollux]
 
 rising_bodies  = [mars]
@@ -293,11 +291,11 @@ setting_bodies = [mars]
 transit_bodies = [mars]
 
 rising_bodies  = [
-                  m31, m42, m45,
+                  m31, m42, m45, m57,
                   mercury, venus, mars, jupiter, saturn, uranus, neptune]
 setting_bodies = [
-                  m31, m42, m45,
+                  m31, m42, m45, m57,
                   mercury, venus, mars, jupiter, saturn, uranus, neptune]
 transit_bodies = [antares, deneb, arcturus, pollux,
-                  m31, m42, m45,
+                  m31, m42, m45, m57,
                   mars, jupiter, saturn, uranus, neptune]

@@ -33,6 +33,8 @@ en = {
     'sets':'Sets',
     'sets_abbrev':'Sts.',
     'ring_nebula':'Ring Nebula',
+    'owl_nebula':'Owl Nebula',
+    'crab_nebula':'Crab Nebula',
 }
 #Turkish
 tr = {
@@ -67,6 +69,8 @@ tr = {
     'sets':'batıyor',
     'sets_abbrev':'bt.',
     'ring_nebula':en['ring_nebula'],
+    'owl_nebula':en['owl_nebula'],
+    'crab_nebula':en['crab_nebula'],
 }
 #Chinese
 ch = {
@@ -101,6 +105,8 @@ ch = {
   'sets':'套',
   'sets_abbrev':'套',
   'ring_nebula':en['ring_nebula'],
+  'owl_nebula':en['owl_nebula'],
+  'crab_nebula':en['crab_nebula'],
 }
 #German
 de = {
