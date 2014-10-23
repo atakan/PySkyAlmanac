@@ -18,7 +18,7 @@
 
 from __future__ import division, print_function
 
-import datetime, calendar, ephem, pytz, pyx
+import datetime, calendar, ephem, pytz, pyx, time
 from datetime import timedelta as TD
 
 from almanac_utils import *
@@ -29,47 +29,47 @@ from translations import t
 # In addition we set the year for the chart, the limits for the chart,
 # and make arrangements for the twilight lines.
 
-manually_set = False
+use_city = True
 use_today = True
-manually_set_timezone = False
-if(manually_set):
+use_your_timezone = True
+
+if(use_city):
+    obs_city = 'San Francisco' #See which cities are valid at https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py
+    obs = ephem.city(obs_city)
+else:
     obs = ephem.Observer()
     obs.lat  = '30.669444'
     obs.long = '-81.461667'
     obs.elevation = 7.6
     #obs.temp = 15.0
     #obs.pressure = 1010.0
-else:
-    obs_city = 'San Francisco' #See which cities are valid at https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py
-    obs = ephem.city(obs_city)
 
 if(use_today):
     obs_date = datetime.date.today()
-    #obs_date = datetime.datetime.now()
 else:
-    obs_date = datetime.date(1988,3,4) #set specific date
+    obs_date = datetime.date(2015,3,4)
 
-if(manually_set_timezone):
-    #obsTZ = pytz.timezone('Europe/Istanbul')
-    #obsTZ = pytz.timezone('US/Pacific')
-    obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal time, +3 summer time
-else:
-    #from pytz import reference
-    #localtime = reference.LocalTimezone()
-    #my_tz = localtime.tzname(obs_date) #can't use `PDT`, need `US/Pacific`
-    #alternate solution is to just use offset
-    import time
+if(use_your_timezone):
     if time.daylight:
         offsetHour = time.altzone / 3600
     else:
         offsetHour = time.timezone / 3600
+    # TODO: the chart needs to account for negatives, returns 7 instead of -7 during PST daylight savings time. At the moment using the wrong timezone!
     my_tz = 'Etc/GMT{0:+d}'.format(int(offsetHour))
     obsTZ = pytz.timezone(str(my_tz))
+else:
+    #obsTZ = pytz.timezone('US/Pacific')
+    #obsTZ = pytz.timezone('Europe/Istanbul')
+    #obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal time, +3 summer time
+    #obsTZ = pytz.timezone('Etc/GMT+2')
+    #obsTZ = pytz.timezone('Etc/GMT+8') # UTC+8 for Chinese Standard time
+    obsTZ = pytz.timezone('Etc/GMT-7') # UTC-8 for PST, UTC-7 during daylight savings time.
 
 utcTZ = pytz.timezone('UTC')
 year = obs_date.year
 begin_day_datetime = datetime.datetime(year-1, 12, 31, 12, tzinfo=obsTZ) # noon of the last day of previous year
 begin_day = ephem.Date(begin_day_datetime.astimezone(utcTZ)) # convert to UTC
+hrs_utc_offset = -(24.*obsTZ.utcoffset(begin_day,is_dst=time.daylight).days + obsTZ.utcoffset(begin_day,is_dst=time.daylight).seconds/3600)
 if calendar.isleap(year) :
     no_days = 367
 else :
@@ -95,13 +95,13 @@ obs.horizon = '-0:34' # 34 arcminutes lower than normal horizon
 # We know that the date of the solstice doesn't give us the dates we want, but
 # for now, I will round up/down for that date until can calculate more accurately.
 # Will be okay for people next to the equator and less accurate the closer you get to the arctic/antarctic circles.
-solstice_date = ephem.date(ephem.next_solstice(obs_date) - 8./24) # TODO: rectify for locale (solstice_date/obs_sunrise/obs_sunset)
+solstice_date = ephem.date(ephem.next_solstice(obs_date) - hrs_utc_offset*ephem.hour)
 if(solstice_date.triple()[0]>obs_date.year): # make a check for running this code after the solstice
-    solstice_date = ephem.date(ephem.previous_solstice(obs_date) - 8./24)
+    solstice_date = ephem.date(ephem.previous_solstice(obs_date) - hrs_utc_offset*ephem.hour)
 # Calculate Earliest Sunset
-obs_sunset = ephem.date(obs.previous_setting(ephem.Sun(), solstice_date) - 8./24)
+obs_sunset = ephem.date(obs.previous_setting(ephem.Sun(), solstice_date) - hrs_utc_offset*ephem.hour)
 # Calculate Latest Sunrise
-obs_sunrise = ephem.date(obs.next_rising(ephem.Sun(), solstice_date) - 8./24)
+obs_sunrise = ephem.date(obs.next_rising(ephem.Sun(), solstice_date) - hrs_utc_offset*ephem.hour)
 print('earliest sunset: {}'.format(obs_sunset))
 print('solstice: {}'.format(solstice_date))
 print('latest sunrise: {}'.format(obs_sunrise))

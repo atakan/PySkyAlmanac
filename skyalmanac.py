@@ -27,7 +27,7 @@ from pyx import path, canvas, color, style, text, graph
 from almanac_bg import *
 from almanac_moon import *
 from almanac_utils import *
-from local_info import obs, obsTZ, utcTZ, year, earliest_sunset, latest_sunrise
+from local_info import obs, obsTZ, utcTZ, year, earliest_sunset, latest_sunrise, hrs_utc_offset, time
 from local_info import begin_day, begin_day_datetime, no_days
 from local_info import first_sunday, first_sunday_datetime
 from local_info import rising_bodies, transit_bodies, setting_bodies
@@ -36,6 +36,7 @@ from translations import t
 equation_of_time = False
 display_moon_stuff = True
 display_bg = True
+display_dst_msg = True
 
 locale.setlocale(locale.LC_ALL,'')
 mnt_names = []
@@ -238,6 +239,16 @@ c.insert(bclc)
 c.insert(mclc)
 c.insert(clc)
 
+def conjunction_appulse(obs, obj_0, obj_1):
+    # Conjunction (☌)
+
+    # Appulse
+
+    # Occultation
+    # Have plenty of time to finish before a planet occultation, next one scheduled for 22 November 2065 when Venus transits Jupiter
+    # Theta Ophiuchi (background) and Mercury (foreground) will transit on 4 December 2015 at 16.14 (UT), elongation 9.6° East.
+    pass
+
 def body_path_calibrator(canv, bd) :
     # rising
     if bd in rising_bodies :
@@ -291,16 +302,19 @@ def body_path_calibrator(canv, bd) :
 xincr = chart.width/((chart.URcorn-chart.ULcorn)/ephem.hour)
 times = []
 #start_time = 17
-start_time = ephem.Date(sun_set[0] - 8.*ephem.hour).tuple()[3] # TODO: not hardcoded to this timezone
+start_time = ephem.Date(sun_set[0] - hrs_utc_offset*ephem.hour).tuple()[3]
 #end_time = 7
-end_time = ephem.Date(sun_rise[0] - 8.*ephem.hour).tuple()[3] # TODO: not hardcoded to this timezone
+end_time = ephem.Date(sun_rise[0] - hrs_utc_offset*ephem.hour).tuple()[3]
 for i in range(24-start_time+end_time+1):
     if(i+start_time == 24):
-        times.append(t['midnight'])
+        if(display_dst_msg):
+            times.append(t['midnight']+'*')
+        else:
+            times.append(t['midnight'])
     else:
         times.append('{:02d}'.format((i+start_time)%24))
 for i, tlab in enumerate(times):
-    x = ulx+i*xincr # TODO: verify times are correctly placed over vertical lines
+    x = ulx+i*xincr
     y1 = -0.25
     y2 = chart.height+0.15
     c.text(x, y1, tlab, [text.halign.center, text.valign.baseline])
@@ -402,6 +416,15 @@ except:
     repo_url = 'https://github.com/atakan/PySkyAlmanac'
 c.text(0.0, chart.height/2.0, r'{\tiny{\sffamily PySkyAlmanac:} {\ttfamily '+repo_url+'}}',
        [text.halign.center,text.valign.bottom, pyx.trafo.rotate(90), color.cmyk.Black])
+
+if(time.daylight):
+    dst_msg = '*This chart was printed with daylight savings times.'
+    print('This chart was printed with daylight savings times.')
+else:
+    dst_msg = '*This chart was printed with regular times and does not account for daylight savings time.'
+    print('This chart was printed with regular times and does not account for daylight savings time.')
+if(display_dst_msg):
+    c.text(chart.width/2.0, -0.75, r'{\tiny{\ttfamily '+dst_msg+'}}', [text.halign.center,text.valign.bottom, color.cmyk.Black])
 
 try:
     from local_info import obs_city
