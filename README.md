@@ -18,6 +18,7 @@ It is of course possible your city isn't [listed](https://github.com/brandon-rho
 
 Turkish, English and Chinese languages are supported. In `translations.py` change `t=en` to either `tr` or `ch`.
 
+Options:
 ```
 equation_of_time = False  # plot equation of time
 display_moon_stuff = True # for moon stuff
@@ -26,6 +27,9 @@ display_dst_msg = True    # prints a note on accounting for DST
 use_city = True           # use a city from the modest pyephem database
 use_today = True          # use the year based on today
 use_your_timezone = True  # are you printing for your timezone
+output_pdf = True
+output_png = True
+png_transparency = False
 ```
 
 ###Plotting Astronomical Catalog Objects

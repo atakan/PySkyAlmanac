@@ -37,6 +37,9 @@ equation_of_time = False
 display_moon_stuff = True
 display_bg = True
 display_dst_msg = True
+output_pdf = True
+output_png = True
+png_transparency = False
 
 locale.setlocale(locale.LC_ALL,'')
 mnt_names = []
@@ -437,4 +440,12 @@ except:
     except:
         output_filename = 'almanac_{}'.format(year)
 
-c.writePDFfile(output_filename)
+if(output_pdf):
+    c.writePDFfile(output_filename)
+
+if(output_png):
+    # use `gs --help | grep png` for valid devices, or add a `resolution` parameter
+    if(png_transparency):
+        c.writeGSfile(filename=output_filename+'.png',device='pngalpha')
+    else:
+        c.writeGSfile(filename=output_filename+'.png',device='png16m')
