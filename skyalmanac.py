@@ -19,8 +19,7 @@
 from __future__ import division, print_function
 
 from math import floor, fmod, fabs, atan2, atan, asin, sqrt, sin, cos
-import datetime, calendar, ephem, pytz, pyx
-import locale
+import datetime, calendar, ephem, pytz, pyx, locale
 from datetime import timedelta as TD
 from pyx import path, canvas, color, style, text, graph
 
@@ -242,16 +241,6 @@ c.insert(bclc)
 c.insert(mclc)
 c.insert(clc)
 
-def conjunction_appulse(obs, obj_0, obj_1):
-    # Conjunction (☌)
-
-    # Appulse
-
-    # Occultation
-    # Have plenty of time to finish before a planet occultation, next one scheduled for 22 November 2065 when Venus transits Jupiter
-    # Theta Ophiuchi (background) and Mercury (foreground) will transit on 4 December 2015 at 16.14 (UT), elongation 9.6° East.
-    pass
-
 def body_path_calibrator(canv, bd) :
     # rising
     if bd in rising_bodies :
@@ -429,23 +418,28 @@ else:
 if(display_dst_msg):
     c.text(chart.width/2.0, -0.75, r'{\tiny{\ttfamily '+dst_msg+'}}', [text.halign.center,text.valign.bottom, color.cmyk.Black])
 
-try:
-    from local_info import obs_city
-    output_filename = 'almanac_{}_{}'.format(year,obs_city.replace(' ','_'))
-except:
+def outputAlmanac(output_pdf=True, output_png=True, png_transparency=False):
     try:
-        output_lon = str(obs.long).split(':')[0]#.replace('-','n')
-        output_lat = str(obs.lat).split(':')[0]#.replace('-','n')
-        output_filename = 'almanac_{}_{}_{}'.format(year,output_lat,output_lon)
+        from local_info import obs_city
+        output_filename = 'almanac_{}_{}'.format(year,obs_city.replace(' ','_'))
     except:
-        output_filename = 'almanac_{}'.format(year)
+        try:
+            output_lon = str(obs.long).split(':')[0]#.replace('-','n')
+            output_lat = str(obs.lat).split(':')[0]#.replace('-','n')
+            output_filename = 'almanac_{}_{}_{}'.format(year,output_lat,output_lon)
+        except:
+            output_filename = 'almanac_{}'.format(year)
 
-if(output_pdf):
-    c.writePDFfile(output_filename)
+    if(output_pdf):
+        c.writePDFfile(output_filename)
 
-if(output_png):
-    # use `gs --help | grep png` for valid devices, or add a `resolution` parameter
-    if(png_transparency):
-        c.writeGSfile(filename=output_filename+'.png',device='pngalpha')
-    else:
-        c.writeGSfile(filename=output_filename+'.png',device='png16m')
+    if(output_png):
+        # use `gs --help | grep png` for valid devices, or add a `resolution` parameter
+        if(png_transparency):
+            c.writeGSfile(filename=output_filename+'.png',device='pngalpha')
+        else:
+            c.writeGSfile(filename=output_filename+'.png',device='png16m')
+
+    return(output_filename)
+    
+outputAlmanac(output_pdf, output_png, png_transparency)
