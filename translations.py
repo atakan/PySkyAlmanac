@@ -110,7 +110,39 @@ ch = {
 }
 #German
 de = {
-
+    'midnight':'Mitternacht',
+    'evening':'ABEND',
+    'morning':'MORGEN',
+    'andromeda':'Andromedagalaxie',
+    'orion':'Orionnebel',
+    'sevensisters':en['sevensisters'],
+    'waning':'Abnehmender',
+    'moonrise_times':'Mondaufgang',
+    'waxing':'Zunehmender',
+    'moonset_times':'Monduntergang',
+    'newmoon':'Neumond',
+    'firstquarter':'Erstes Quartal',
+    'fullmoon':'Vollmond',
+    'lastquarter':'Letzten Quartal',
+    'rises':'Anstieg',
+    'mercury':'Merkur',
+    'venus':'Venus',
+    'mars':'Mars',
+    'jupiter':'Jupiter',
+    'saturn':'Saturn',
+    'uranus':'Uranus',
+    'neptune':'Neptun',
+    'antares':'Antares',
+    'transits':'Transite',
+    'transits_abbrev':'Trns.',
+    'arcturus':'Arctur',
+    'pollux':'Pollux',
+    'deneb':'Deneb',
+    'sets':'Sätze',
+    'sets_abbrev':'Stz.',
+    'ring_nebula':'Ringnebel',
+    'owl_nebula':'Eulennebel',
+    'crab_nebula':'Crabnebel',
 }
 #Experimentally automatically detect
 experiment = False
@@ -120,11 +152,11 @@ if(experiment):
         t=tr
     elif(os.environ['LANGUAGE']=='en_US'):
         t=en
-    # elif(os.environ['LANGUAGE']=='de_DE'):
-    #     t=de
+    elif(os.environ['LANGUAGE']=='de_DE'):
+        t=de
     # elif(os.environ['LANGUAGE']=='?'):
     #     t=ch
     else:
         t=en
 else: # otherwise manually set
-    t=en
+    t=de

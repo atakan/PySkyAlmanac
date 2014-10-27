@@ -2,7 +2,7 @@ This program prepares a chart similar to Sky & Telescope's annual [*Skygazer's A
 
 The code is written in [Python](http://www.python.org/). It uses [PyX](http://pyx.sourceforge.net/) for preparing the PDF output, [PyEphem](http://rhodesmill.org/pyephem/) for astronomical calculations, and [SciPy](http://www.scipy.org/) for a simple root-finding calculation. PyEphem uses routines from [XEphem](http://www.clearskyinstitute.com/xephem/).
 
-This is in development stage and certainly has bugs. I tried to make it easy to adapt to different locations and years; in particular, the comments and the function names are in English. If you plan to port it to a different locale (location, timeframe, language etc.) please let me know. I would be more than happy to help out.
+This is in development stage and certainly has bugs. We're more than happy to help anyone trying to port this to a different locale (location, timeframe, language etc.).
 
 Keywords: Sky almanac, celestial events, astronomy
 
@@ -16,7 +16,7 @@ See `local_info.py` to see options for setting your location. There is minimal s
 
 It is of course possible your city isn't [listed](https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py), so in that case switch the `manually_set` flag to `True` and fill in your latitude, longitude, year, and timezone at minimum. Set `use_your_timezone` to False if you are generating for a different city than where you are. See [this quick reference](http://rhodesmill.org/pyephem/quick.html#observers) on setting up your observer. `elevation` (m) is optional. Can also set `epoch`, `temp` and `pressure` if desired.
 
-Turkish, English and Chinese languages are supported. In `translations.py` change `t=en` to either `tr` or `ch`.
+Turkish, English, Chinese, and German languages are supported. In `translations.py` change `t=en` to either `tr`, `ch` or `de`.
 
 Options:
 ```
@@ -46,7 +46,7 @@ If you are generating this sky chart, please consider forking the repository and
 * [Ankara](https://atakan.github.io/PySkyAlmanac/)
 * [San Francisco](https://digitalvapor.github.io/PySkyAlmanac/)
 
-My primary aim in [this fork](https://github.com/digitalvapor/PySkyAlmanac) has been to change out all of the hard-coded Ankara values so that any location generates with a clean format. Many thanks to [atakan](https://github.com/atakan/PySkyAlmanac) for creating such a great tool!! If you are curious on what is on my to-do list please check out [my pull request](https://github.com/atakan/PySkyAlmanac/pull/1) and don't hesistate to [use the issue tracker](https://github.com/digitalvapor/PySkyAlmanac/issues) for this fork, or [atakan's](https://github.com/atakan/PySkyAlmanac/issues). There are definitely bugs, sorry :)
+My primary aim in [this fork](https://github.com/digitalvapor/PySkyAlmanac) has been to change out all of the hard-coded Ankara values so that any location generates with a clean format. Many thanks to [atakan](https://github.com/atakan/PySkyAlmanac) for creating such a great tool!! If you want to give a reference to the tool creating the chart, you can use the URL https://github.com/atakan/PySkyAlmanac. If you are curious on what is on my to-do list please check out [my pull request](https://github.com/atakan/PySkyAlmanac/pull/1) and don't hesistate to [use the issue tracker](https://github.com/digitalvapor/PySkyAlmanac/issues) for this fork, or [atakan's](https://github.com/atakan/PySkyAlmanac/issues). There are definitely bugs, sorry :)
 
 #License
-You can copy, modify and distribute the code under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html). See the file COPYING for more details. You can also freely distribute the end product, the chart itself. If you want to give a reference to the tool creating the chart, you can use the URL https://github.com/atakan/PySkyAlmanac
+You can copy, modify and distribute the code under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html). See the file COPYING for more details. You can also freely distribute the end product, the chart itself.
