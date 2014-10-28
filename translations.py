@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #English
 en = {
+    'lang':'English',
     'midnight':'Midnight',
     'evening':'EVENING',
     'morning':'MORNING',
@@ -35,9 +36,11 @@ en = {
     'ring_nebula':'Ring Nebula',
     'owl_nebula':'Owl Nebula',
     'crab_nebula':'Crab Nebula',
+    'found':'found',
 }
 #Turkish
 tr = {
+    'lang':'Türk',
     'midnight':'geceyarısı',
     'evening':'AKŞAM',
     'morning':'SABAH',
@@ -71,9 +74,11 @@ tr = {
     'ring_nebula':en['ring_nebula'],
     'owl_nebula':en['owl_nebula'],
     'crab_nebula':en['crab_nebula'],
+    'found':'bulundu',
 }
 #Chinese
-ch = {
+zh = {
+  'lang':'中國',
   'midnight':'半夜',
   'evening':'晚上',
   'morning':'早晨',
@@ -107,9 +112,11 @@ ch = {
   'ring_nebula':en['ring_nebula'],
   'owl_nebula':en['owl_nebula'],
   'crab_nebula':en['crab_nebula'],
+  'found':'人找到了',
 }
 #German
 de = {
+    'lang':'Deutsch',
     'midnight':'Mitternacht',
     'evening':'ABEND',
     'morning':'MORGEN',
@@ -143,10 +150,20 @@ de = {
     'ring_nebula':'Ringnebel',
     'owl_nebula':'Eulennebel',
     'crab_nebula':'Crabnebel',
+    'found':'vorgefundener',
 }
-#Experimentally automatically detect
-experiment = False
-if(experiment):
+# You can set lang=de,ch,en,tr as the language. This uses the hardcoded astronomical values above.
+# If you set lang='de','zh','en', 'tr' or any other string of a language, then this assumes you are wanting to try to automatically translate all of the strings. This is just using google translate (via goslate), so it possibly going to be poorly translated, but better than nothing!
+lang = None
+experiment_detect = False
+experiment_translate = True
+def_lang = en
+if(lang!=None):
+    t=lang
+else:
+    t=def_lang
+if(experiment_detect):
+    #print('trying to autodetect language...')
     import os
     if(os.environ['LANGUAGE']=='tr_TR'):
         t=tr
@@ -154,9 +171,23 @@ if(experiment):
         t=en
     elif(os.environ['LANGUAGE']=='de_DE'):
         t=de
-    # elif(os.environ['LANGUAGE']=='?'):
-    #     t=ch
-    else:
-        t=en
-else: # otherwise manually set
-    t=de
+    # elif(os.environ['LANGUAGE']=='?'): #chinese?
+    #     t=zh
+    #print(t['lang']+' '+t['found']+'!')
+elif(isinstance(t,basestring) and experiment_translate):
+    try:
+        print('trying automatic translation...')
+        import goslate
+        gs = goslate.Goslate()
+        c = {}
+        for key in en.keys():
+            c[key] = gs.translate(en[key],t).encode('utf-8')
+            #print(c[key])
+        t = c
+        print(lang+'...✓')
+    except:
+        print('Install goslate with `pip install goslate` for automatic translation.')
+        t=def_lang
+else:
+    t=def_lang
+    #print('default language ('+t['lang']+') used.')

@@ -11,6 +11,10 @@ Keywords: Sky almanac, celestial events, astronomy
 * PyX - If using Python2, need older version of PyX like [0.12.1](http://sourceforge.net/projects/pyx/files/pyx/0.12.1/). Python3, can use current stable release. Download tarball and run `python ./setup.py install`.
 * SciPy - Install full stack with `apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose`. See [here](http://www.scipy.org/install.html).
 
+**Optional**
+* [git](http://git-scm.com) - `apt-get install git` - Git is assumed to have been installed. I don't know why you wouldn't have it :). Necessary if hosting your own city's almanac and want to link to it in the chart. See [skyalmanac.py#L406](https://github.com/digitalvapor/PySkyAlmanac/blob/master/skyalmanac.py#L406).
+* [goslate](http://pythonhosted.org/goslate/) - `pip install goslate` - used in [translations.py](https://github.com/digitalvapor/PySkyAlmanac/blob/master/translations.py). (experimental)
+
 ##Instructions
 See `local_info.py` to see options for setting your location. There is minimal setup; you only have to change the `obs_city` field. That is, `obs_city = 'San Francisco'` or `Istanbul`.
 
