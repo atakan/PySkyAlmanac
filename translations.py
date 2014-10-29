@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 #English
 en = {
     'lang':'English',
@@ -155,26 +156,20 @@ de = {
 # You can set lang=de,ch,en,tr as the language. This uses the hardcoded astronomical values above.
 # If you set lang='de','zh','en', 'tr' or any other string of a language, then this assumes you are wanting to try to automatically translate all of the strings. This is just using google translate (via goslate), so it possibly going to be poorly translated, but better than nothing!
 lang = None
+# lang = de
+# lang = 'no'
 experiment_detect = False
-experiment_translate = True
+experiment_translate = False
 def_lang = en
-if(lang!=None):
+encode_these = [zh] # TODO: a list of translated languages that need to be dealt with. either deal with it here, or via latex.
+if(isinstance(lang,dict)):
+    if(lang in encode_these):
+        # for item in lang.keys():
+        #     lang[item]=lang[item].encode('utf-8')
+        #     print(lang[item])
+        t=def_lang # TODO: for now, until have solution
     t=lang
-else:
-    t=def_lang
-if(experiment_detect):
-    #print('trying to autodetect language...')
-    import os
-    if(os.environ['LANGUAGE']=='tr_TR'):
-        t=tr
-    elif(os.environ['LANGUAGE']=='en_US'):
-        t=en
-    elif(os.environ['LANGUAGE']=='de_DE'):
-        t=de
-    # elif(os.environ['LANGUAGE']=='?'): #chinese?
-    #     t=zh
-    #print(t['lang']+' '+t['found']+'!')
-elif(isinstance(t,basestring) and experiment_translate):
+elif(isinstance(lang,basestring) and experiment_translate):
     try:
         print('trying automatic translation...')
         import goslate
@@ -187,6 +182,20 @@ elif(isinstance(t,basestring) and experiment_translate):
         print(lang+'...✓')
     except:
         print('Install goslate with `pip install goslate` for automatic translation.')
+        t=def_lang
+elif(experiment_detect and lang==None):
+    #print('trying to autodetect language...')
+    import os
+    if(os.environ['LANGUAGE']=='tr_TR'):
+        t=tr
+    elif(os.environ['LANGUAGE']=='en_US'):
+        t=en
+    elif(os.environ['LANGUAGE']=='de_DE'):
+        t=de
+    # elif(os.environ['LANGUAGE']=='?'): #chinese?
+    #     t=zh
+    #print(t['lang']+' '+t['found']+'!')
+    else:
         t=def_lang
 else:
     t=def_lang
