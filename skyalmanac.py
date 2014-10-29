@@ -29,7 +29,7 @@ from almanac_utils import *
 from local_info import obs, obsTZ, utcTZ, year, earliest_sunset, latest_sunrise, hrs_utc_offset, time
 from local_info import begin_day, begin_day_datetime, no_days
 from local_info import first_sunday, first_sunday_datetime
-from local_info import rising_bodies, transit_bodies, setting_bodies
+from bodies import rising_bodies, transit_bodies, setting_bodies
 from translations import t
 
 equation_of_time = False
@@ -98,6 +98,7 @@ for doy in range(no_days+8) :
 pyx.unit.set(defaultunit='cm')
 pyx.text.set(mode='latex')
 pyx.text.preamble(r'\usepackage[utf8]{inputenc}')
+#pyx.text.preamble(r'\usepackage[utf8x]{inputenc}')
 pyx.text.preamble(r'\usepackage[T1]{fontenc}')
 pyx.text.preamble(r'\usepackage{ae,aecompl}')
 pyx.text.preamble(r'\usepackage{rotating}')
@@ -441,5 +442,5 @@ def outputAlmanac(output_pdf=True, output_png=True, png_transparency=False):
             c.writeGSfile(filename=output_filename+'.png',device='png16m')
 
     return(output_filename)
-    
+
 outputAlmanac(output_pdf, output_png, png_transparency)
