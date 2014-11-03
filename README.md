@@ -4,7 +4,7 @@ The code is written in [Python](http://www.python.org/). It uses [PyX](http://py
 
 This is in development stage and certainly has bugs. We're more than happy to help anyone trying to port this to a different locale (location, timeframe, language etc.).
 
-Keywords: Sky almanac, celestial events, astronomy
+Keywords: sky almanac, celestial events, astronomy
 
 ##Install Dependencies
 * PyEphem - `pip install pyephem`
@@ -18,11 +18,13 @@ Keywords: Sky almanac, celestial events, astronomy
 ##Instructions
 See `local_info.py` to see options for setting your location. There is minimal setup; you only have to change the `obs_city` field. That is, `obs_city = 'San Francisco'` or `Istanbul`.
 
+###More instructions for customization
 It is of course possible your city isn't [listed](https://github.com/brandon-rhodes/pyephem/blob/master/ephem/cities.py), so in that case switch the `manually_set` flag to `True` and fill in your latitude, longitude, year, and timezone at minimum. Set `use_your_timezone` to False if you are generating for a different city than where you are. See [this quick reference](http://rhodesmill.org/pyephem/quick.html#observers) on setting up your observer. `elevation` (m) is optional. Can also set `epoch`, `temp` and `pressure` if desired.
 
-Turkish, English, Chinese, and German languages are supported. In `translations.py` change `t=en` to either `tr`, `ch` or `de`.
+Turkish, English, Chinese, and German languages are included. In `translations.py` change `lang=None` to either `en`, `tr`, `zh` or `de`. You can leave as `None` to leave as English default. Experimentally, you can also translate into *any* language by setting `lang` to a string of the language, for example `lang='no'` for Norwegian.
 
 Options:
+
 ```
 equation_of_time = False  # plot equation of time
 display_moon_stuff = True # for moon stuff
@@ -49,6 +51,10 @@ If you are generating this sky chart, please consider forking the repository and
 
 * [Ankara](https://atakan.github.io/PySkyAlmanac/)
 * [San Francisco](https://digitalvapor.github.io/PySkyAlmanac/)
+
+In your [gh-pages](https://github.com/digitalvapor/PySkyAlmanac/tree/gh-pages) branch, I made it super easy to just update change your [_config.yml](https://github.com/digitalvapor/PySkyAlmanac/blob/gh-pages/_config.yml)!
+
+You can also include [this](https://gist.github.com/digitalvapor/83507017f7fc780554ff) `post-commit` hook if you want to automatically publish updates from your readme onto your `gh-pages` branch.
 
 My primary aim in [this fork](https://github.com/digitalvapor/PySkyAlmanac) has been to change out all of the hard-coded Ankara values so that any location generates with a clean format. Many thanks to [atakan](https://github.com/atakan/PySkyAlmanac) for creating such a great tool!! If you want to give a reference to the tool creating the chart, you can use the URL https://github.com/atakan/PySkyAlmanac. If you are curious on what is on my to-do list please check out [my pull request](https://github.com/atakan/PySkyAlmanac/pull/1) and don't hesistate to [use the issue tracker](https://github.com/digitalvapor/PySkyAlmanac/issues) for this fork, or [atakan's](https://github.com/atakan/PySkyAlmanac/issues). There are definitely bugs, sorry :)
 
