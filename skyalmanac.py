@@ -35,7 +35,7 @@ from translations import t
 equation_of_time = False
 display_moon_stuff = True
 display_bg = True
-display_dst_msg = True
+display_dst_msg = False
 output_pdf = True
 output_png = True
 png_transparency = False
@@ -98,7 +98,6 @@ for doy in range(no_days+8) :
 pyx.unit.set(defaultunit='cm')
 pyx.text.set(mode='latex')
 pyx.text.preamble(r'\usepackage[utf8]{inputenc}')
-#pyx.text.preamble(r'\usepackage[utf8x]{inputenc}')
 pyx.text.preamble(r'\usepackage[T1]{fontenc}')
 pyx.text.preamble(r'\usepackage{ae,aecompl}')
 pyx.text.preamble(r'\usepackage{rotating}')
@@ -410,7 +409,7 @@ except:
 c.text(0.0, chart.height/2.0, r'{\tiny{\sffamily PySkyAlmanac:} {\ttfamily '+repo_url+'}}',
        [text.halign.center,text.valign.bottom, pyx.trafo.rotate(90), color.cmyk.Black])
 
-if(time.daylight):
+if(time.localtime().tm_isdst):
     dst_msg = '*This chart was printed with daylight savings times.'
     print('This chart was printed with daylight savings times.')
 else:

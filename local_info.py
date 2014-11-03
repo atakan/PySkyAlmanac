@@ -51,7 +51,7 @@ else:
     obs_date = datetime.date(2015,3,4)
 
 if(use_your_timezone):
-    if time.daylight:
+    if(time.localtime().tm_isdst):
         offsetHour = time.altzone / 3600
     else:
         offsetHour = time.timezone / 3600
@@ -64,13 +64,13 @@ else:
     #obsTZ = pytz.timezone('EET') # Turkey uses Eastern European Time: UTC+2 normal time, +3 summer time
     #obsTZ = pytz.timezone('Etc/GMT+2')
     #obsTZ = pytz.timezone('Etc/GMT+8') # UTC+8 for Chinese Standard time
-    obsTZ = pytz.timezone('Etc/GMT-7') # UTC-8 for PST, UTC-7 during daylight savings time.
+    obsTZ = pytz.timezone('Etc/GMT-8') # UTC-8 for PST, UTC-7 during daylight savings time.
 
 utcTZ = pytz.timezone('UTC')
 year = obs_date.year
 begin_day_datetime = datetime.datetime(year-1, 12, 31, 12, tzinfo=obsTZ) # noon of the last day of previous year
 begin_day = ephem.Date(begin_day_datetime.astimezone(utcTZ)) # convert to UTC
-hrs_utc_offset = -(24.*obsTZ.utcoffset(begin_day,is_dst=time.daylight).days + obsTZ.utcoffset(begin_day,is_dst=time.daylight).seconds/3600)
+hrs_utc_offset = -(24.*obsTZ.utcoffset(begin_day,is_dst=time.localtime().tm_isdst).days + obsTZ.utcoffset(begin_day,is_dst=time.localtime().tm_isdst).seconds/3600)
 if calendar.isleap(year) :
     no_days = 367
 else :
