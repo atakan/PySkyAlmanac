@@ -1,0 +1,22 @@
+This is a specialized version of the PySkyAlmanac for Middle East
+Technical University, 2017. It is bilingual and also includes a LaTeX wrapper to
+present the chart along with some usage notes.
+To get the chart use (do not type "> ", just what comes after that):
+> python skyalmanac_biling.py
+This will produce almanac_2017_ODTU_Fizik.eps
+Then run:
+> latex almanac_poster.tex
+> dvips -Ppdf almanac_poster.dvi
+> ps2pdf almanac_poster.ps
+which should produce a nice PDF file.
+    
+If you want to skip creating Postscript file and go directly to PDF,
+you first need to modify skyalmanac_biling.py to produce PDF file
+by changing the last line (it should be clear if you look in there),
+then translate METU logo into PDF with epstopdf script. Then you
+should be good to go, I did not try this though.
+
+have fun,
+
+atakan gürkan
+ato.gurkan@gmail.com
