@@ -1,3 +1,6 @@
+**I am no longer maintaining this project. If I wrote it again, I would write
+it with completely different tools, but this does not interest me at the moment (January 2023). --ato **
+
 This is program that prepares a chart similar to Sky & Telescope's
 annual [*Skygazer's Almanac*](http://www.shopatsky.com/product/Skygazers-Almanac-2011-Wall-Chart/). 
 
